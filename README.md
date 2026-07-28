@@ -1,2 +1,2 @@
 # agent-ai-nano
-AI agent built using JavaScript and React-Ink
+AI agent named Nano which is built using JavaScript and React-Ink
