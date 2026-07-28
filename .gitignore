@@ -6,7 +6,7 @@ node_modules/
 .env.*
 
 # Storage
-storage/
+storage/*
 !storage/.gitkeep
 
 # Logs
