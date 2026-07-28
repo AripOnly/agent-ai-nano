@@ -1,12 +1,12 @@
 // workflow.js
 
-import { config } from "../config/config.js";
-import { baseAgent } from "../core/baseAgent.js";
+import { config } from "../../config/config.js";
+import { baseAgent } from "../core/base-agent.js";
 import { conversation } from "../session/conversation.js";
 import { promptBuilder } from "../prompt/prompt-builder.js";
 import { tools } from "../tools/tools.js";
 
-export async function* AgentReAct(input) {
+export async function* Agent(input) {
   const request = {
     provider: config.provider,
     model: config.model,

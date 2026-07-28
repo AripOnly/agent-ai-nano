@@ -7,7 +7,7 @@ import BigText from "ink-big-text";
 import TextInput from "ink-text-input";
 import Spinner from "ink-spinner";
 
-import { AgentReAct } from "../../agents/agent-react.js";
+import { Agent } from "../../agents/agent.js";
 import Chat from "./components/Chat.jsx";
 import Thinking from "./components/Thinking.jsx";
 
@@ -28,9 +28,7 @@ export default function App() {
     setThinking(true);
 
     async function stream() {
-      for await (const event of AgentReAct(userInput)) {
-        // console.log(event, null, 2);
-        // continue;
+      for await (const event of Agent(userInput)) {
         if (event.type === "model_output" || event.type === "error") {
           setThinking(false);
           setChat((prev) => {
