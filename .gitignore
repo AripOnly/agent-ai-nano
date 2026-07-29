@@ -5,6 +5,10 @@ node_modules/
 .env
 .env.*
 
+# Config
+config/*
+!config/.gitkeep
+
 # Storage
 storage/*
 !storage/.gitkeep

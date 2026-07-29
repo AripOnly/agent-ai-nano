@@ -2,12 +2,14 @@ import { GoogleGenAI } from "@google/genai";
 import "dotenv/config";
 import { googleCleanOutput } from "./google-clean-output.js";
 import { EVENT } from "../../../core/event-type.js";
+import { settings } from "../../../config/setting.js";
 
 const client = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY,
+  apiKey: await settings.get("apiKey"),
 });
 
 export async function* google(request) {
+  console.log(request.model);
   try {
     const body = {
       model: request.model,
