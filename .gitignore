@@ -6,7 +6,7 @@ node_modules/
 .env.*
 
 # Config
-*settings.json
+config/settings.json
 
 # Storage
 storage/*
