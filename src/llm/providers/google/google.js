@@ -18,7 +18,7 @@ export async function* google(request) {
       store: false,
       stream: true,
       generation_config: {
-        temperature: 0.7,
+        temperature: 1.0,
         thinking_level: "low",
         thinking_summaries: "auto",
       },

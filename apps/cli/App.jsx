@@ -81,12 +81,7 @@ export default function App() {
 
       <Box marginTop={1}>{thinking && <Thinking />}</Box>
 
-      <Box
-        borderStyle={"round"}
-        borderColor={"#363737"}
-        marginTop={1}
-        backgroundColor={"#212121"}
-      >
+      <Box borderStyle={"round"} borderColor={"#363737"} marginTop={1}>
         <Text>{"> "}</Text>
         <TextInput
           value={input}

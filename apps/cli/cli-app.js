@@ -2,8 +2,8 @@
 import readline from "node:readline/promises";
 import { exit, stdin as input, stdout as output } from "node:process";
 
-import { AgentReAct } from "../../agents/agent-react.js";
-import { EVENT } from "../../core/event-type.js";
+import { Agent } from "../../src/agents/agent.js";
+import { EVENT } from "../../src/core/event-type.js";
 const rl = readline.createInterface({
   input,
   output,
@@ -52,7 +52,7 @@ export async function chatCLI() {
     process.stdout.write(`\n${COLOR.WHITE}Gemini: ${COLOR.RESET}`);
 
     try {
-      for await (const event of AgentReAct(userInput)) {
+      for await (const event of Agent(userInput)) {
         renderCLI(event);
       }
     } catch (error) {

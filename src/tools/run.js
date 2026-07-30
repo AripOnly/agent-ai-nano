@@ -14,7 +14,7 @@ const execAsync = promisify(exec);
  *   code?: number|string|null
  * }>}
  */
-export async function Run(command) {
+export async function Run({ command }) {
   try {
     const { stdout, stderr } = await execAsync(command, {
       timeout: 5000, // Maksimal 5 detik

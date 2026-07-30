@@ -1,37 +1,26 @@
 // src/agent/execute.js
 
-// src/agent/execute.js
-
 import { tools } from "../tools/tools.js";
 
-export async function toolExecute(toolCall) {
-  const name = toolCall.name;
-  const arg = JSON.parse(toolCall.arguments);
+export async function toolExecute(tool) {
+  const { name, arguments: rawArgument } = tool;
 
-  switch (name) {
-    case "Run":
-      return await tools.Run(arg.command);
+  if (!(name in tools)) {
+    return {
+      success: false,
+      error: `Tool "${name}" not found.`,
+    };
+  }
 
-    case "Read":
-      return await tools.Read({
-        path: arg.path,
-        start_line: arg.start_line,
-        end_line: arg.end_line,
-      });
+  try {
+    const args =
+      typeof rawArgument === "string" ? JSON.parse(rawArgument) : rawArgument;
 
-    case "Write":
-      return await tools.Write({
-        path: arg.path,
-        content: arg.content,
-        mode: arg.mode,
-        start_line: arg.start_line,
-        end_line: arg.end_line,
-      });
-
-    default:
-      return {
-        success: false,
-        error: `Unknown tool: ${name}`,
-      };
+    return await tools[name](args);
+  } catch (error) {
+    return {
+      success: false,
+      error: error.message,
+    };
   }
 }

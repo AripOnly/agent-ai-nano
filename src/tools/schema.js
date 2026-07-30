@@ -1,4 +1,4 @@
-const read = {
+const Read = {
   type: "function",
   name: "Read",
   description:
@@ -28,7 +28,7 @@ const read = {
   },
 };
 
-const write = {
+const Write = {
   type: "function",
   name: "Write",
 
@@ -88,7 +88,7 @@ The tool automatically prevents path traversal and writing outside the workspace
   },
 };
 
-const run = {
+const Run = {
   type: "function",
 
   name: "Run",
@@ -148,4 +148,36 @@ Execution Limits:
   },
 };
 
-export const schema = { read, write, run };
+const WebSearch = {
+  type: "function",
+  name: "WebSearch",
+  description: "Search the web for up-to-date information.",
+  parameters: {
+    type: "OBJECT",
+    properties: {
+      query: {
+        type: "STRING",
+        description: "The search query.",
+      },
+    },
+    required: ["query"],
+  },
+};
+
+const WebScrape = {
+  type: "function",
+  name: "WebScrape",
+  description: "Retrieve and extract the markdown content of a web page.",
+  parameters: {
+    type: "OBJECT",
+    properties: {
+      url: {
+        type: "STRING",
+        description: "The URL of the web page to scrape.",
+      },
+    },
+    required: ["url"],
+  },
+};
+
+export const schema = { Read, Write, Run, WebSearch, WebScrape };

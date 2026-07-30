@@ -1,6 +1,6 @@
 import React from "react";
 import { render } from "ink";
-import App from "./src/channels/cli/App.jsx";
+import App from "./apps/cli/App";
 
 try {
   const { waitUntilExit } = render(<App />);
