@@ -6,8 +6,7 @@ node_modules/
 .env.*
 
 # Config
-config/*
-!config/.gitkeep
+config/settings.json
 
 # Storage
 storage/*
