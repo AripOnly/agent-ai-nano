@@ -6,12 +6,19 @@ import { Text, Box, Newline } from "ink";
 const User = ({ children }) => {
   return (
     <Box
-      flexDirection="column"
-      backgroundColor={"#212121"}
       padding={1}
+      backgroundColor={"#212121"}
       marginTop={1}
+      flexDirection="row"
+      gap={1}
+      alignItems="center"
     >
-      <Text>{children}</Text>
+      <Box>
+        <Text>👤</Text>
+      </Box>
+      <Box>
+        <Text>{children}</Text>
+      </Box>
     </Box>
   );
 };

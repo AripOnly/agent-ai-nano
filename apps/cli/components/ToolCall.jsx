@@ -35,16 +35,20 @@ const ToolCall = ({ toolCall }) => {
     <Box
       flexDirection="row"
       borderStyle="round"
-      borderColor="gray"
+      borderColor="#212121"
       width={widthBorder}
       paddingX={1}
-      marginTop={1}
+      gap={1}
     >
-      <Text color="#F6850C">{toolCall.name}: </Text>
-
-      <Text color="#898989" wrap="truncate">
-        {arg}
-      </Text>
+      <Box>
+        <Text>🔧</Text>
+      </Box>
+      <Box>
+        <Text color="#F6850C">{toolCall.name}: </Text>
+        <Text color="#898989" wrap="truncate">
+          {arg}
+        </Text>
+      </Box>
     </Box>
   );
 };

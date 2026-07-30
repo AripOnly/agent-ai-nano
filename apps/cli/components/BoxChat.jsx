@@ -1,12 +1,12 @@
 // Chat.jsx
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Text, Box } from "ink";
 import User from "./User.jsx";
 import Response from "./Response.jsx";
 import ToolCall from "./ToolCall.jsx";
 
-export default function Chat({ chat }) {
+export default function BoxChat({ chat }) {
   return chat.map((value, index) => {
     if (value.role === "user") {
       return <User key={index}>{value.content}</User>;

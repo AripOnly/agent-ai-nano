@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Text, useStdout } from "ink";
+import { Box, Text, useWindowSize } from "ink";
 import { unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
@@ -118,7 +118,7 @@ function renderBlock(node, key, context = {}) {
       );
 
     case "thematicBreak": {
-      const width = Math.max(10, (context.columns ?? 80) - 4);
+      const width = Math.max(10, (context.columns ?? 80) - 6);
 
       return (
         <Box key={key} paddingBottom={1}>
@@ -139,8 +139,7 @@ function parseMarkdown(content) {
 }
 
 const MarkdownRenderer = ({ children }) => {
-  const { stdout } = useStdout();
-  const columns = stdout.columns;
+  const { columns } = useWindowSize();
 
   if (!children) return null;
 

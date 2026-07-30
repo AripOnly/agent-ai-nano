@@ -1,26 +1,25 @@
 // App.js
 
 import React, { useEffect, useState } from "react";
-import { Text, Box, useStdout, useApp, Newline } from "ink";
+import { Text, Box, useWindowSize, useApp, Newline } from "ink";
 import Gradient from "ink-gradient";
 import BigText from "ink-big-text";
 import TextInput from "ink-text-input";
 import Spinner from "ink-spinner";
 
-import { Agent } from "../../agents/agent.js";
-import Chat from "./components/Chat.jsx";
+import { Agent } from "../../src/agents/agent.js";
 import Thinking from "./components/Thinking.jsx";
+import BoxChat from "./components/BoxChat.jsx";
 
 export default function App() {
-  const { stdout } = useStdout();
-  const columns = stdout.columns;
+  const { columns } = useWindowSize();
   const { exit } = useApp();
 
   const [input, setInput] = useState("");
   const [userInput, setUserInput] = useState("");
   const [chat, setChat] = useState([]);
   const [thinking, setThinking] = useState(false);
-  const [config, setConfig] = useState();
+  const [setting, setSwtting] = useState();
 
   useEffect(() => {
     if (!userInput) return;
@@ -77,12 +76,17 @@ export default function App() {
       </Box>
 
       <Box flexDirection="column" flexWrap="nowrap">
-        <Chat chat={chat}></Chat>
-        <Newline></Newline>
-        <Thinking>{thinking}</Thinking>
+        <BoxChat chat={chat} />
       </Box>
 
-      <Box borderStyle={"round"} borderColor={"#363737"} marginTop={1}>
+      <Box marginTop={1}>{thinking && <Thinking />}</Box>
+
+      <Box
+        borderStyle={"round"}
+        borderColor={"#363737"}
+        marginTop={1}
+        backgroundColor={"#212121"}
+      >
         <Text>{"> "}</Text>
         <TextInput
           value={input}
