@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Text, useWindowSize } from "ink";
+import { Box, Text, useStdout } from "ink";
 import { unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
@@ -139,7 +139,8 @@ function parseMarkdown(content) {
 }
 
 const MarkdownRenderer = ({ children }) => {
-  const { columns } = useWindowSize();
+  const { stdout } = useStdout();
+  const columns = stdout.columns;
 
   if (!children) return null;
 

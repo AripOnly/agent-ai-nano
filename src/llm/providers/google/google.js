@@ -9,7 +9,6 @@ const client = new GoogleGenAI({
 });
 
 export async function* google(request) {
-  console.log(request.model);
   try {
     const body = {
       model: request.model,

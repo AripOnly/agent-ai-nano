@@ -13,7 +13,6 @@ export default function Chat({ chat }) {
     }
 
     if (value.role === "model_output") {
-      // console.log(value.content);
       return <Response key={index} response={value.content} />;
     }
 

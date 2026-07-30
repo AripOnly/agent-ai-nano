@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Text, useWindowSize } from "ink";
+import { Box, Text, useStdout } from "ink";
 
 function formatToolArgs(argumentsString) {
   try {
@@ -24,7 +24,8 @@ function formatToolArgs(argumentsString) {
 }
 
 const ToolCall = ({ toolCall }) => {
-  const { columns } = useWindowSize();
+  const { stdout } = useStdout();
+  const columns = stdout.columns;
 
   const widthBorder = columns < 100 ? columns - 4 : Math.floor(columns * 0.6);
 

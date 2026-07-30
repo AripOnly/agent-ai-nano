@@ -1,7 +1,7 @@
 // App.js
 
 import React, { useEffect, useState } from "react";
-import { Text, Box, useWindowSize, useApp, Newline } from "ink";
+import { Text, Box, useStdout, useApp, Newline } from "ink";
 import Gradient from "ink-gradient";
 import BigText from "ink-big-text";
 import TextInput from "ink-text-input";
@@ -12,7 +12,8 @@ import Chat from "./components/Chat.jsx";
 import Thinking from "./components/Thinking.jsx";
 
 export default function App() {
-  const { columns } = useWindowSize();
+  const { stdout } = useStdout();
+  const columns = stdout.columns;
   const { exit } = useApp();
 
   const [input, setInput] = useState("");
