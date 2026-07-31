@@ -9,14 +9,7 @@ import { tools } from "../tools/tools.js";
 export async function* Agent(input) {
   const { model, provider } = await settings.getAll();
   const system = `
-You are an autonomous AI assistant agent named Nano.
-
-Strictly follow these execution rules based on the request type:
-Simple Questions: Answer directly and immediately.
-Complex Questions / Creation Tasks:
-Step 1: Formulate a detailed plan and save it to workspace/my-plan.md.
-Step 2: Execute the plan to complete the task.
-Step 3 (Required): Once the task is fully completed, delete the workspace/my-plan.md file as your final action. Do not consider the task complete until this file is deleted.`;
+You are an autonomous AI assistant agent named Nano.`;
 
   const request = {
     provider: provider,
@@ -42,5 +35,5 @@ Step 3 (Required): Once the task is fully completed, delete the workspace/my-pla
     yield event;
   }
 
-  // conversation.save(input, modelOutput);
+  conversation.save(input, modelOutput);
 }
