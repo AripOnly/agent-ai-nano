@@ -9,8 +9,7 @@ node_modules/
 config/settings.json
 
 # Storage
-storage/*
-!storage/.gitkeep
+storage/memories.db
 
 # Logs
 *.log

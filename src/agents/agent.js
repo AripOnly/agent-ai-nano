@@ -1,9 +1,8 @@
 // workflow.js
 
 import { settings } from "../config/setting.js";
-import { baseAgent } from "../core/base-agent.js";
+import { agentLoop } from "./agent-loop.js";
 import { conversation } from "../session/conversation.js";
-import { promptBuilder } from "../prompt/prompt-builder.js";
 import { tools } from "../tools/tools.js";
 
 export async function* Agent(input) {
@@ -11,11 +10,14 @@ export async function* Agent(input) {
   const system = `
 You are an autonomous AI assistant agent named Nano.`;
 
+  const messages = conversation.getHistory();
+  messages.push({ role: "user", text: input });
+
   const request = {
     provider: provider,
     model: model,
     instruction: system,
-    input: await promptBuilder[provider](input),
+    input: messages,
     tools: [
       tools.schema.Read,
       tools.schema.Write,
@@ -25,15 +27,13 @@ You are an autonomous AI assistant agent named Nano.`;
     ],
   };
 
-  let modelOutput = "";
+  conversation.start(input);
 
-  for await (const event of baseAgent(request)) {
-    if (event.type === "model_output") {
-      modelOutput += event.data.text;
-    }
+  for await (const event of agentLoop(request)) {
+    conversation.record(event);
 
     yield event;
   }
 
-  conversation.save(input, modelOutput);
+  conversation.commit();
 }

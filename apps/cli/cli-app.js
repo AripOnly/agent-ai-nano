@@ -3,7 +3,8 @@ import readline from "node:readline/promises";
 import { exit, stdin as input, stdout as output } from "node:process";
 
 import { Agent } from "../../src/agents/agent.js";
-import { EVENT } from "../../src/core/event-type.js";
+import { EVENT } from "../../src/agents/event-type.js";
+import { json } from "node:stream/consumers";
 const rl = readline.createInterface({
   input,
   output,
@@ -23,22 +24,27 @@ function renderCLI(event) {
   if (event.type === EVENT.MODEL_OUTPUT) {
     process.stdout.write(`${COLOR.WHITE}${event.data.text}${COLOR.RESET}`);
   }
-  if (event.type === EVENT.THOUGHT) {
+  if (event.type === EVENT.THOUGHT_SUMMARY) {
     process.stdout.write(`${COLOR.GRAY}${event.data.text}${COLOR.RESET}`);
   }
   if (event.type === EVENT.FUNCTION_CALL) {
     process.stdout.write(
-      `\n\n${COLOR.YELLOW}${event.data.name}: ${Object.values(JSON.parse(event.data.arguments))}${COLOR.RESET}\n\n`,
+      `\n\n${COLOR.YELLOW}${event.data.name}: ${Object.values(event.data.arguments)}${COLOR.RESET}\n\n`,
     );
   }
   if (event.type === EVENT.TOKEN) {
     process.stdout.write(
-      `\n\n${COLOR.GRAY}Total_tokens: ${event.data.text}${COLOR.RESET}\n\n`,
+      `\n\n${COLOR.GRAY}Tokens: ${JSON.stringify(event.data, null, 2)}${COLOR.RESET}\n\n`,
+    );
+  }
+  if (event.type === EVENT.ERROR) {
+    process.stdout.write(
+      `\n\n${COLOR.RED}[ERROR]: ${event.data.text}${COLOR.RESET}\n\n`,
     );
   }
 }
 
-export async function chatCLI() {
+async function chatCLI() {
   console.log("=== Chatbot Gemini ===");
   console.log("Type 'exit' to quit.\n");
 
@@ -64,3 +70,5 @@ export async function chatCLI() {
 
   rl.close();
 }
+
+await chatCLI();

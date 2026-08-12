@@ -7,10 +7,9 @@ db.pragma("journal_mode = WAL");
 db.pragma("foreign_keys = ON");
 
 db.exec(`
-  CREATE TABLE IF NOT EXISTS conversation (
+  CREATE TABLE IF NOT EXISTS turn (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user TEXT NOT NULL,
-    assistant TEXT NOT NULL,
+    parts TEXT NOT NULL,
     created_at DATETIME DEFAULT (datetime('now','localtime'))
   )
 `);

@@ -1,8 +1,18 @@
 // src/provider/google/google-clean-output.js
 
-import { EVENT } from "../../../core/event-type.js";
+import { EVENT } from "../../../agents/event-type.js";
 
-export async function* googleCleanOutput(llmStream) {
+function parseArguments(raw) {
+  if (typeof raw !== "string" || raw.trim() === "") return {};
+
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return {};
+  }
+}
+
+export async function* stream(llmStream) {
   let currentStepType = null;
 
   const toolState = {
@@ -13,6 +23,7 @@ export async function* googleCleanOutput(llmStream) {
   };
 
   for await (const event of llmStream) {
+    // console.log(JSON.stringify(event, null, 2));
     switch (event.event_type) {
       case "step.start":
         currentStepType = event.step.type;
@@ -40,7 +51,7 @@ export async function* googleCleanOutput(llmStream) {
 
           case "thought_summary":
             yield {
-              type: EVENT.THOUGHT,
+              type: EVENT.THOUGHT_SUMMARY,
               data: {
                 text: delta.content.text,
               },
@@ -72,7 +83,7 @@ export async function* googleCleanOutput(llmStream) {
               signature: toolState.signature,
               call_id: toolState.id,
               name: toolState.name,
-              arguments: toolState.arguments,
+              arguments: parseArguments(toolState.arguments),
             },
           };
 
@@ -85,17 +96,19 @@ export async function* googleCleanOutput(llmStream) {
         currentStepType = null;
         break;
 
-      case "interaction.completed":
+      case "interaction.completed": {
+        const usage = event.interaction?.usage ?? {};
+
         yield {
           type: EVENT.TOKEN,
           data: {
-            text:
-              typeof event.interaction.usage !== "string"
-                ? JSON.stringify(event.interaction.usage)
-                : event.interaction.usage,
+            inputTokens: usage.total_input_tokens ?? 0,
+            outputTokens: usage.total_output_tokens ?? 0,
+            totalTokens: usage.total_tokens ?? 0,
           },
         };
         break;
+      }
     }
   }
 }
