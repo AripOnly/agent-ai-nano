@@ -134,37 +134,41 @@ export function feed({ reasoningSignature, toolCall, toolResult }) {
     return parts;
   }
 
-  const functionCall = {
-    role: EVENT.TOOL_CALL,
-    content: {
-      type: "tool_call",
-      call_id: toolCall.call_id,
-      name: toolCall.name,
-      arguments: toolCall.arguments,
-    },
-  };
+  for (let i = 0; i < toolCall.length; i++) {
+    const functionCall = {
+      role: EVENT.TOOL_CALL,
+      content: {
+        type: "tool_call",
+        call_id: toolCall[i].call_id,
+        name: toolCall[i].name,
+        arguments: toolCall[i].arguments,
+      },
+    };
 
-  if (toolCall.signature != null) {
-    functionCall.content.signature = toolCall.signature;
+    if (toolCall[i].signature != null) {
+      functionCall.content.signature = toolCall[i].signature;
+    }
+
+    parts.push(functionCall);
   }
 
-  parts.push(functionCall);
+  for (let i = 0; i < toolCall.length; i++) {
+    const functionResult = {
+      role: EVENT.TOOL_RESULT,
+      content: {
+        type: "tool_result",
+        call_id: toolCall[i].call_id,
+        name: toolCall[i].name,
+        result: toolResult[i],
+      },
+    };
 
-  const functionResult = {
-    role: EVENT.TOOL_RESULT,
-    content: {
-      type: "tool_result",
-      call_id: toolCall.call_id,
-      name: toolCall.name,
-      result: toolResult,
-    },
-  };
+    if (toolCall[i].signature != null) {
+      functionResult.content.signature = toolCall[i].signature;
+    }
 
-  if (toolCall.signature != null) {
-    functionResult.content.signature = toolCall.signature;
+    parts.push(functionResult);
   }
-
-  parts.push(functionResult);
 
   return parts;
 }

@@ -1,6 +1,6 @@
-import { config } from "../config/setting.js";
+import { settings } from "../config/setting.js";
 
-const apiKey = config.get("serper_api_key");
+const apiKey = settings.get("serper_api_key");
 
 export async function WebSearch({ query }) {
   try {

@@ -15,7 +15,7 @@ export async function* agentLoop(request) {
   }
 
   while (true) {
-    let toolCall = null;
+    let toolCall = [];
     let reasoningSignature = "";
 
     for await (const event of provider.request(request)) {
@@ -25,34 +25,38 @@ export async function* agentLoop(request) {
           break;
 
         case EVENT.TOOL_CALL:
-          toolCall = { ...event.content };
+          toolCall.push({ ...event.content });
           break;
       }
 
       yield event;
     }
 
-    if (!toolCall) break;
+    if (toolCall.length === 0) break;
 
-    const result = await toolExecute(toolCall);
+    const results = await Promise.all(
+      toolCall.map((tc) => toolExecute(tc)),
+    );
 
-    yield {
-      role: EVENT.TOOL_RESULT,
-      content: {
-        call_id: toolCall.call_id,
-        name: toolCall.name,
-        result,
-        ...(toolCall.signature != null
-          ? { signature: toolCall.signature }
-          : {}),
-      },
-    };
+    for (let i = 0; i < toolCall.length; i++) {
+      yield {
+        role: EVENT.TOOL_RESULT,
+        content: {
+          call_id: toolCall[i].call_id,
+          name: toolCall[i].name,
+          result: results[i],
+          ...(toolCall[i].signature != null
+            ? { signature: toolCall[i].signature }
+            : {}),
+        },
+      };
+    }
 
     request.input.push(
       ...provider.feed({
         reasoningSignature,
         toolCall,
-        toolResult: toStr(result),
+        toolResult: results.map(toStr),
       }),
     );
   }
