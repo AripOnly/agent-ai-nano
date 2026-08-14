@@ -2,11 +2,11 @@
 
 import Database from "better-sqlite3";
 
-const db = new Database("./storage/memories.db");
-db.pragma("journal_mode = WAL");
-db.pragma("foreign_keys = ON");
+const sql = new Database("./storage/memories.db");
+sql.pragma("journal_mode = WAL");
+sql.pragma("foreign_keys = ON");
 
-db.exec(`
+sql.exec(`
   CREATE TABLE IF NOT EXISTS turn (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     parts TEXT NOT NULL,
@@ -14,4 +14,4 @@ db.exec(`
   )
 `);
 
-export default db;
+export default sql;

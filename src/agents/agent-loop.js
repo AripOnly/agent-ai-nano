@@ -3,8 +3,11 @@
 import { EVENT } from "./event-type.js";
 import { llm } from "../llm/llm.js";
 import { toolExecute } from "./tool-execute.js";
+import { toStr } from "../utils/tostr.js";
 
 export async function* agentLoop(request) {
+  // console.log(request);
+  // return;
   const provider = llm[request.provider];
 
   if (!provider) {
@@ -13,16 +16,16 @@ export async function* agentLoop(request) {
 
   while (true) {
     let toolCall = null;
-    let thoughtSignature = "";
+    let reasoningSignature = "";
 
-    for await (const event of provider.stream(request)) {
-      switch (event.type) {
-        case EVENT.THOUGHT_SIGNATURE:
-          thoughtSignature = event.data.text;
+    for await (const event of provider.request(request)) {
+      switch (event.role) {
+        case EVENT.REASONING_SIGNATURE:
+          reasoningSignature = event.content.signature;
           break;
 
-        case EVENT.FUNCTION_CALL:
-          toolCall = { ...event.data };
+        case EVENT.TOOL_CALL:
+          toolCall = { ...event.content };
           break;
       }
 
@@ -34,8 +37,8 @@ export async function* agentLoop(request) {
     const result = await toolExecute(toolCall);
 
     yield {
-      type: EVENT.FUNCTION_RESULT,
-      data: {
+      role: EVENT.TOOL_RESULT,
+      content: {
         call_id: toolCall.call_id,
         name: toolCall.name,
         result,
@@ -46,7 +49,11 @@ export async function* agentLoop(request) {
     };
 
     request.input.push(
-      ...provider.feed({ thoughtSignature, toolCall, toolResult: result }),
+      ...provider.feed({
+        reasoningSignature,
+        toolCall,
+        toolResult: toStr(result),
+      }),
     );
   }
 }

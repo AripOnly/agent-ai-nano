@@ -16,7 +16,7 @@ export async function* stream(llmStream) {
   let currentStepType = null;
 
   const toolState = {
-    signature: "",
+    signature: null,
     id: null,
     name: null,
     arguments: "",
@@ -24,13 +24,14 @@ export async function* stream(llmStream) {
 
   for await (const event of llmStream) {
     // console.log(JSON.stringify(event, null, 2));
+    // continue;
     switch (event.event_type) {
       case "step.start":
         currentStepType = event.step.type;
 
         if (currentStepType === "function_call") {
           toolState.id = event.step.id;
-          toolState.signature = event.step.signature;
+          toolState.signature = event.step.signature ?? null;
           toolState.name = event.step.name;
           toolState.arguments = "";
         }
@@ -42,8 +43,8 @@ export async function* stream(llmStream) {
         switch (delta.type) {
           case "text":
             yield {
-              type: EVENT.MODEL_OUTPUT,
-              data: {
+              role: EVENT.ASSISTANT,
+              content: {
                 text: delta.text,
               },
             };
@@ -51,18 +52,18 @@ export async function* stream(llmStream) {
 
           case "thought_summary":
             yield {
-              type: EVENT.THOUGHT_SUMMARY,
-              data: {
-                text: delta.content.text,
+              role: EVENT.REASONING_SUMMARY,
+              content: {
+                summary: delta.content.text,
               },
             };
             break;
 
           case "thought_signature":
             yield {
-              type: EVENT.THOUGHT_SIGNATURE,
-              data: {
-                text: delta.signature,
+              role: EVENT.REASONING_SIGNATURE,
+              content: {
+                signature: delta.signature,
               },
             };
             break;
@@ -78,8 +79,8 @@ export async function* stream(llmStream) {
       case "step.stop":
         if (currentStepType === "function_call") {
           yield {
-            type: EVENT.FUNCTION_CALL,
-            data: {
+            role: EVENT.TOOL_CALL,
+            content: {
               signature: toolState.signature,
               call_id: toolState.id,
               name: toolState.name,
@@ -87,7 +88,7 @@ export async function* stream(llmStream) {
             },
           };
 
-          toolState.signature = "";
+          toolState.signature = null;
           toolState.id = null;
           toolState.name = null;
           toolState.arguments = "";
@@ -100,8 +101,8 @@ export async function* stream(llmStream) {
         const usage = event.interaction?.usage ?? {};
 
         yield {
-          type: EVENT.TOKEN,
-          data: {
+          role: EVENT.TOKEN,
+          content: {
             inputTokens: usage.total_input_tokens ?? 0,
             outputTokens: usage.total_output_tokens ?? 0,
             totalTokens: usage.total_tokens ?? 0,

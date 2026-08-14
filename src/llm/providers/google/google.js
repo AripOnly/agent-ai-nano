@@ -1,82 +1,79 @@
 import { GoogleGenAI } from "@google/genai";
 import "dotenv/config";
-import { stream as streamEvents } from "./stream.js";
+import { stream } from "./stream.js";
 import { EVENT } from "../../../agents/event-type.js";
 import { settings } from "../../../config/setting.js";
+import { toStr } from "../../../utils/tostr.js";
 
 const client = new GoogleGenAI({
   apiKey: await settings.get("apiKey"),
 });
 
 function toGemini(part) {
-  const type = part.type ?? "text";
+  const role = part.role ?? "text";
 
-  if (type === "usage" || type === "error") return null;
+  if (role === EVENT.TOKEN || role === EVENT.ERROR) return null;
 
-  if (type === "reasoning") {
+  if (role === EVENT.REASONING_SIGNATURE) {
     const thought = {
       type: "thought",
-      signature: part.signature,
+      signature: part.content.signature,
     };
-
-    if (part.text) {
-      thought.summary = part.text;
-    }
 
     return thought;
   }
 
-  if (type === "tool_call") {
+  if (role === EVENT.TOOL_CALL) {
     const functionCall = {
       type: "function_call",
-      id: part.call_id,
-      name: part.name,
-      arguments: part.arguments,
+      id: part.content.call_id,
+      name: part.content.name,
+      arguments: part.content.arguments,
     };
 
-    if (part.signature != null) {
-      functionCall.signature = part.signature;
+    if (part.content.signature != null) {
+      functionCall.signature = part.content.signature;
     }
 
     return functionCall;
   }
 
-  if (type === "tool_result") {
+  if (role === EVENT.TOOL_RESULT) {
     const functionResult = {
       type: "function_result",
-      call_id: part.call_id,
-      name: part.name,
-      result:
-        typeof part.result === "string"
-          ? part.result
-          : JSON.stringify(part.result),
+      call_id: part.content.call_id,
+      name: part.content.name,
+      result: part.content.result,
     };
 
-    if (part.signature != null) {
-      functionResult.signature = part.signature;
+    if (part.content.signature != null) {
+      functionResult.signature = part.content.signature;
     }
 
     return functionResult;
   }
 
-  if (part.role === "assistant") {
+  if (role === EVENT.ASSISTANT) {
     return {
       type: "model_output",
-      content: [{ type: "text", text: part.text }],
+      content: [{ type: "text", text: part.content.text }],
     };
   }
 
-  return {
-    type: "user_input",
-    content: [{ type: "text", text: part.text }],
-  };
+  if (role === EVENT.USER) {
+    return {
+      type: "user_input",
+      content: [{ type: "text", text: part.content.text }],
+    };
+  }
 }
 
-export async function* stream(request) {
+export async function* request(request) {
   try {
-    const input = request.input
-      .map(toGemini)
-      .filter((part) => part != null);
+    const input = request.input.map(toGemini).filter((part) => part != null);
+    // console.log(JSON.stringify(input, null, 2));
+    // console.log(input);
+    // return;
 
     const body = {
       model: request.model,
@@ -94,7 +91,7 @@ export async function* stream(request) {
 
     const llmStream = await client.interactions.create(body);
 
-    yield* streamEvents(llmStream);
+    yield* stream(llmStream);
   } catch (err) {
     let message = err.message;
 
@@ -114,22 +111,22 @@ export async function* stream(request) {
     }
 
     yield {
-      type: EVENT.ERROR,
-      data: {
-        text: `error: ${err}\nmessage: ${message}`,
+      role: EVENT.ERROR,
+      content: {
+        message: `error: ${err}\nmessage: ${message}`,
+        // message: err.stack,
       },
     };
   }
 }
 
-export function feed({ thoughtSignature, toolCall, toolResult }) {
+export function feed({ reasoningSignature, toolCall, toolResult }) {
   const parts = [];
 
-  if (thoughtSignature) {
+  if (reasoningSignature) {
     parts.push({
-      role: "assistant",
-      type: "reasoning",
-      signature: thoughtSignature,
+      role: EVENT.REASONING_SIGNATURE,
+      content: { signature: reasoningSignature },
     });
   }
 
@@ -138,29 +135,33 @@ export function feed({ thoughtSignature, toolCall, toolResult }) {
   }
 
   const functionCall = {
-    role: "assistant",
-    type: "tool_call",
-    call_id: toolCall.call_id,
-    name: toolCall.name,
-    arguments: toolCall.arguments,
+    role: EVENT.TOOL_CALL,
+    content: {
+      type: "tool_call",
+      call_id: toolCall.call_id,
+      name: toolCall.name,
+      arguments: toolCall.arguments,
+    },
   };
 
   if (toolCall.signature != null) {
-    functionCall.signature = toolCall.signature;
+    functionCall.content.signature = toolCall.signature;
   }
 
   parts.push(functionCall);
 
   const functionResult = {
-    role: "tool",
-    type: "tool_result",
-    call_id: toolCall.call_id,
-    name: toolCall.name,
-    result: toolResult,
+    role: EVENT.TOOL_RESULT,
+    content: {
+      type: "tool_result",
+      call_id: toolCall.call_id,
+      name: toolCall.name,
+      result: toolResult,
+    },
   };
 
   if (toolCall.signature != null) {
-    functionResult.signature = toolCall.signature;
+    functionResult.content.signature = toolCall.signature;
   }
 
   parts.push(functionResult);

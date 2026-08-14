@@ -21,25 +21,25 @@ const COLOR = {
 };
 
 function renderCLI(event) {
-  if (event.type === EVENT.MODEL_OUTPUT) {
-    process.stdout.write(`${COLOR.WHITE}${event.data.text}${COLOR.RESET}`);
+  if (event.role === EVENT.ASSISTANT) {
+    process.stdout.write(`${COLOR.WHITE}${event.content.text}${COLOR.RESET}`);
   }
-  if (event.type === EVENT.THOUGHT_SUMMARY) {
-    process.stdout.write(`${COLOR.GRAY}${event.data.text}${COLOR.RESET}`);
+  if (event.role === EVENT.REASONING_SUMMARY) {
+    process.stdout.write(`${COLOR.GRAY}${event.content.summary}${COLOR.RESET}`);
   }
-  if (event.type === EVENT.FUNCTION_CALL) {
+  if (event.role === EVENT.TOOL_CALL) {
     process.stdout.write(
-      `\n\n${COLOR.YELLOW}${event.data.name}: ${Object.values(event.data.arguments)}${COLOR.RESET}\n\n`,
+      `\n\n${COLOR.YELLOW}${event.content.name}: ${Object.values(event.content.arguments)}${COLOR.RESET}\n\n`,
     );
   }
-  if (event.type === EVENT.TOKEN) {
+  if (event.role === EVENT.TOKEN) {
     process.stdout.write(
-      `\n\n${COLOR.GRAY}Tokens: ${JSON.stringify(event.data, null, 2)}${COLOR.RESET}\n\n`,
+      `\n\n${COLOR.GRAY}Tokens: ${JSON.stringify(event.content.totalTokens, null, 2)}${COLOR.RESET}\n\n`,
     );
   }
-  if (event.type === EVENT.ERROR) {
+  if (event.role === EVENT.ERROR) {
     process.stdout.write(
-      `\n\n${COLOR.RED}[ERROR]: ${event.data.text}${COLOR.RESET}\n\n`,
+      `\n\n${COLOR.RED}[ERROR]: ${event.content.message}${COLOR.RESET}\n\n`,
     );
   }
 }
