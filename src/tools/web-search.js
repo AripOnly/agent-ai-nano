@@ -1,4 +1,6 @@
-const apiKey = "877efcec464e70629e8aa4627600c0b1bbec9715";
+import { config } from "../config/setting.js";
+
+const apiKey = config.get("serper_api_key");
 
 export async function WebSearch({ query }) {
   try {
