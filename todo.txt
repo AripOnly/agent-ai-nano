@@ -1,0 +1,5 @@
+- Selesaikan integrasi AI ke aplikasi
+- Review kode di folder src/utils
+- Riset penggunaan library OpenAI
+- Istirahat sejenak
+- Update README dengan fitur terbaru

@@ -103,9 +103,9 @@ export async function* stream(llmStream) {
         yield {
           role: EVENT.TOKEN,
           content: {
-            inputTokens: usage.total_input_tokens ?? 0,
-            outputTokens: usage.total_output_tokens ?? 0,
-            totalTokens: usage.total_tokens ?? 0,
+            input_tokens: usage.total_input_tokens ?? 0,
+            output_tokens: usage.total_output_tokens ?? 0,
+            total_tokens: usage.total_tokens ?? 0,
           },
         };
         break;

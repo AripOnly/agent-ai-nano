@@ -1,9 +1,9 @@
 import { workEnv } from "./workEnv.js";
 import { readFile } from "fs/promises";
 
-export async function system() {
+export async function instruction(name) {
   const insDefault = await readFile(
-    `${process.cwd()}/src/prompts/default.txt`,
+    `${process.cwd()}/src/prompts/${name}.txt`,
     "utf-8",
   );
 

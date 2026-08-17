@@ -1,10 +1,18 @@
 import React from "react";
 import { Box, Text, useStdout } from "ink";
 
-function formatToolArgs(argumentsString) {
-  try {
-    const args = JSON.parse(argumentsString);
+function formatToolArgs(argumentsValue) {
+  let args = argumentsValue;
 
+  if (typeof args === "string") {
+    try {
+      args = JSON.parse(args);
+    } catch {
+      return args;
+    }
+  }
+
+  if (args && typeof args === "object") {
     return Object.entries(args)
       .map(([key, value]) => {
         let text = String(value);
@@ -18,28 +26,19 @@ function formatToolArgs(argumentsString) {
         return `${key}=${text}`;
       })
       .join(" ");
-  } catch {
-    return argumentsString ?? "";
   }
+
+  return String(args ?? "");
 }
 
 const ToolCall = ({ toolCall }) => {
   const { stdout } = useStdout();
   const columns = stdout.columns;
 
-  const widthBorder = columns < 100 ? columns - 4 : Math.floor(columns * 0.6);
-
   const arg = formatToolArgs(toolCall.arguments);
 
   return (
-    <Box
-      flexDirection="row"
-      borderStyle="round"
-      borderColor="#212121"
-      width={widthBorder}
-      paddingX={1}
-      gap={1}
-    >
+    <Box flexDirection="row" paddingX={1} gap={1}>
       <Box>
         <Text>🔧</Text>
       </Box>

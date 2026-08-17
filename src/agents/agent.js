@@ -1,34 +1,30 @@
-// workflow.js
+// agent.js
 
 import { settings } from "../config/setting.js";
 import { agentLoop } from "./agent-loop.js";
 import { conversation } from "../session/conversation.js";
-import { tools } from "../tools/tools.js";
-import { system } from "../prompts/system.js";
 import { EVENT } from "./event-type.js";
+import { agents } from "./registry.js";
+import { instruction } from "../prompts/instruction.js";
 
-export async function* Agent(input) {
+export async function* agent({ name, prompt }) {
   try {
-    const { model, provider } = await settings.getAll();
+    const [provider, model] = await settings
+      .get("model")
+      .then((text) => text.split("/"));
 
     const messages = conversation.getHistory();
-    messages.push({ role: "user", content: { text: input } });
+    messages.push({ role: "user", content: { text: prompt } });
 
     const request = {
-      provider: provider,
-      model: model,
-      instruction: await system(),
+      provider,
+      model,
+      instruction: await instruction(agents[name].instruction),
       input: messages,
-      tools: [
-        tools.schema.Read,
-        tools.schema.Write,
-        tools.schema.Run,
-        tools.schema.WebScrape,
-        tools.schema.WebSearch,
-      ],
+      tools: agents[name].tools,
     };
 
-    conversation.start(input);
+    conversation.start(prompt);
 
     for await (const event of agentLoop(request)) {
       conversation.record(event);

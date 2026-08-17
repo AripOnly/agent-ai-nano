@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Box, Text } from "ink";
-import MarkdownRenderer from "./markdown/MarkdownRenderer.jsx";
+import MarkdownRenderer from "./markdown/Markdown.jsx";
 
 const Response = ({ response }) => {
   return (
@@ -9,7 +9,7 @@ const Response = ({ response }) => {
         <Text>🤖</Text>
       </Box>
       <Box>
-        <MarkdownRenderer>{response}</MarkdownRenderer>
+        <MarkdownRenderer content={response} />
       </Box>
     </Box>
   );

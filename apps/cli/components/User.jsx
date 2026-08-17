@@ -4,6 +4,11 @@ import React from "react";
 import { Text, Box, Newline } from "ink";
 
 const User = ({ children }) => {
+  const text =
+    typeof children === "object" && children !== null
+      ? children.text
+      : children;
+
   return (
     <Box
       padding={1}
@@ -17,7 +22,7 @@ const User = ({ children }) => {
         <Text>👤</Text>
       </Box>
       <Box>
-        <Text>{children}</Text>
+        <Text>{text}</Text>
       </Box>
     </Box>
   );

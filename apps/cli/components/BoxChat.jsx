@@ -1,6 +1,6 @@
 // Chat.jsx
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Text, Box } from "ink";
 import User from "./User.jsx";
 import Response from "./Response.jsx";
@@ -12,12 +12,20 @@ export default function BoxChat({ chat }) {
       return <User key={index}>{value.content}</User>;
     }
 
-    if (value.role === "model_output") {
+    if (value.role === "assistant") {
       return <Response key={index} response={value.content} />;
     }
 
-    if (value.role === "function_call") {
+    if (value.role === "tool_call") {
       return <ToolCall key={index} toolCall={value.content} />;
+    }
+
+    if (value.role === "error") {
+      return (
+        <Text key={index} color="red">
+          {value.content.message ?? value.content}
+        </Text>
+      );
     }
   });
 }

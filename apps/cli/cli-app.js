@@ -2,9 +2,9 @@
 import readline from "node:readline/promises";
 import { exit, stdin as input, stdout as output } from "node:process";
 
-import { Agent } from "../../src/agents/agent.js";
+import { agent } from "../../src/agents/agent.js";
 import { EVENT } from "../../src/agents/event-type.js";
-import { json } from "node:stream/consumers";
+
 const rl = readline.createInterface({
   input,
   output,
@@ -22,24 +22,26 @@ const COLOR = {
 
 function renderCLI(event) {
   if (event.role === EVENT.ASSISTANT) {
-    process.stdout.write(`${COLOR.WHITE}${event.content.text}${COLOR.RESET}`);
+    process.stdout.write(`\n${COLOR.WHITE}${event.content.text}${COLOR.RESET}`);
   }
   if (event.role === EVENT.REASONING_SUMMARY) {
-    process.stdout.write(`${COLOR.GRAY}${event.content.summary}${COLOR.RESET}`);
+    process.stdout.write(
+      `\n${COLOR.GRAY}${event.content.summary}${COLOR.RESET}`,
+    );
   }
   if (event.role === EVENT.TOOL_CALL) {
     process.stdout.write(
-      `\n\n${COLOR.YELLOW}${event.content.name}: ${Object.values(event.content.arguments)}${COLOR.RESET}\n\n`,
+      `\n${COLOR.YELLOW}${event.content.name}: ${Object.values(event.content.arguments)}${COLOR.RESET}`,
     );
   }
   if (event.role === EVENT.TOKEN) {
     process.stdout.write(
-      `\n\n${COLOR.GRAY}Tokens: ${JSON.stringify(event.content.totalTokens, null, 2)}${COLOR.RESET}\n\n`,
+      `\n${COLOR.GRAY}Tokens: ${JSON.stringify(event.content.total_tokens, null, 2)}${COLOR.RESET}\n`,
     );
   }
   if (event.role === EVENT.ERROR) {
     process.stdout.write(
-      `\n\n${COLOR.RED}[ERROR]: ${event.content.message}${COLOR.RESET}\n\n`,
+      `\n${COLOR.RED}[ERROR]: ${event.content.message}${COLOR.RESET}\n`,
     );
   }
 }
@@ -49,16 +51,17 @@ async function chatCLI() {
   console.log("Type 'exit' to quit.\n");
 
   while (true) {
+    console.log(`${COLOR.WHITE}====== User ====== ${COLOR.RESET}`);
     const userInput = await rl.question(`\n${COLOR.GREEN}User: ${COLOR.RESET}`);
     const input = userInput.trim().toLowerCase();
     if (input === "exit") {
       break;
     }
 
-    process.stdout.write(`\n${COLOR.WHITE}Gemini: ${COLOR.RESET}`);
+    console.log(`\n${COLOR.WHITE}====== Nano ====== ${COLOR.RESET}`);
 
     try {
-      for await (const event of Agent(userInput)) {
+      for await (const event of agent({ name: "nano", prompt: userInput })) {
         renderCLI(event);
       }
     } catch (error) {

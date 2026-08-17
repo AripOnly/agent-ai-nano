@@ -1,4 +1,5 @@
 // src/core/protocol/google-protocol.js
+// event-type.js
 
 export const EVENT = {
   USER: "user",
@@ -8,6 +9,7 @@ export const EVENT = {
   REASONING_SIGNATURE: "reasoning_signature",
   TOOL_CALL: "tool_call",
   TOOL_RESULT: "tool_result",
+  COMPACTION: "compaction",
   TOKEN: "token",
   ERROR: "error",
 };
