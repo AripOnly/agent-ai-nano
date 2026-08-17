@@ -1,111 +1,85 @@
-// App.js
+// App.jsx
 
 import React, { useEffect, useState } from "react";
-import { Text, Box, useWindowSize, useApp, Newline, Static } from "ink";
-import Gradient from "ink-gradient";
-import BigText from "ink-big-text";
-import TextInput from "ink-text-input";
-import Spinner from "ink-spinner";
+import { Box, useApp, Static, Text } from "ink";
 
-import { agent } from "../../src/agents/agent.js";
-import Thinking from "./components/Thinking.jsx";
+import { useChat } from "./hooks/useChat.js";
+import { useColumns } from "./hooks/useColumns.js";
+import Header from "./components/Header.jsx";
+import PromptInput from "./components/PromptInput.jsx";
+import Spinner from "./components/Spinner.jsx";
 import BoxChat from "./components/BoxChat.jsx";
-import { conversation } from "../../src/session/conversation.js";
+import Thinking from "./components/Thinking.jsx";
+import { tokenUsage } from "../../src/usage/token-usage.js";
+import { settings } from "../../src/config/setting.js";
 
 export default function App() {
-  const { columns } = useWindowSize();
+  const columns = useColumns();
   const { exit } = useApp();
+  const { chat, history, thinking, loading, send } = useChat();
+  const [token, setToken] = useState(0);
 
-  const [input, setInput] = useState("");
-  const [userInput, setUserInput] = useState("");
-  const [chat, setChat] = useState([]);
-  const [thinking, setThinking] = useState(false);
-  const [setting, setSwtting] = useState();
+  const header = <Header key="nano-header" columns={columns} />;
+
+  const historyItems = history.map((item, i) => (
+    <BoxChat key={`h-${i}`} chat={[item]} />
+  ));
+
+  const boxLoading = (
+    <Text>
+      <Text color="green">
+        <Spinner type="dotsCircle" />
+      </Text>
+      {" Loading..."}
+    </Text>
+  );
 
   useEffect(() => {
-    if (!userInput) return;
-
-    setChat((prev) => [
-      ...prev,
-      { role: "user", content: { text: userInput } },
-    ]);
-    setThinking(true);
-
-    async function stream() {
-      for await (const event of agent({ name: "nano", prompt: userInput })) {
-        if (event.role === "assistant") {
-          setThinking(false);
-          setChat((prev) => {
-            const next = [...prev];
-            const last = next[next.length - 1];
-
-            if (last?.role === "assistant") {
-              last.content += event.content.text;
-            } else {
-              next.push({
-                role: "assistant",
-                content: event.content.text,
-              });
-            }
-
-            return next;
-          });
-        }
-
-        if (event.role === "reasoning_summary") {
-          setThinking(true);
-        } else {
-          setThinking(false);
-        }
-
-        if (event.role === "tool_call" || event.role === "error") {
-          setThinking(false);
-          setChat((prev) => [...prev, event]);
-        }
-      }
+    async function getTokens() {
+      const tokens = await tokenUsage.get();
+      setToken(tokens.total_tokens);
     }
 
-    stream();
-  }, [userInput]);
+    getTokens();
+  }, [history]);
 
   return (
-    <Box flexDirection="column" width={columns}>
-      <Box marginBottom={1} justifyContent="center">
-        <Box width={columns - 2}>
-          <Gradient name="rainbow">
-            <BigText text="NANO" />
-          </Gradient>
-        </Box>
-      </Box>
+    <>
+      <Static
+        items={[header, ...historyItems]}
+        style={{ width: columns, paddingLeft: 1, paddingRight: 1 }}
+      >
+        {(el) => el}
+      </Static>
 
-      <Box marginTop={1} justifyContent="center">
-        <Box width={columns - 2} flexDirection="column" flexWrap="nowrap">
+      <Box flexDirection="column" width={columns} paddingX={1}>
+        <Box width={"100%"} flexDirection="column" flexWrap="nowrap">
           <BoxChat chat={chat} />
         </Box>
-      </Box>
 
-      <Box marginTop={1} justifyContent="center">
-        <Box width={columns - 2}>{thinking && <Thinking />}</Box>
-      </Box>
+        <Box marginTop={1} justifyContent="center" paddingX={2}>
+          <Box width={"100%"}>{thinking && <Thinking />}</Box>
+        </Box>
 
-      <Box marginTop={1} justifyContent="center">
-        <Box width={columns - 2} borderStyle={"round"} borderColor={"#363737"}>
-          <Text>{"👤 "}</Text>
-          <TextInput
-            value={input}
-            onChange={setInput}
-            onSubmit={(value) => {
-              if (value === "exit") {
-                exit();
-                return;
-              }
+        <PromptInput onSend={send} onExit={exit} />
 
-              setUserInput(value);
-              setInput("");
-            }}
-          />
+        <Box
+          marginBottom={2}
+          paddingX={2}
+          flexDirection="row"
+          flexWrap="nowrap"
+          justifyContent="space-between"
+        >
+          <Box>{loading ? boxLoading : ""}</Box>
+          <Box flexDirection="row" flexWrap="nowrap" gap={2}>
+            <Text>Token: {token}</Text>
+            <Text>|</Text>
+            <Text>agent: Nano</Text>
+            <Text>|</Text>
+            <Text>model: gemini/gemini-3.1-flash-lite</Text>
+          </Box>
         </Box>
       </Box>
-    </Box>
+    </>
   );
 }

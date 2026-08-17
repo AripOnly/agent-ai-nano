@@ -35,7 +35,7 @@ export async function* agentLoop(request) {
 
         case EVENT.TOKEN:
           if (event.content.total_tokens > 1500) {
-            console.log("\n\n[COMPACTION]");
+            // console.log("\n\n[COMPACTION]");
           }
           break;
       }

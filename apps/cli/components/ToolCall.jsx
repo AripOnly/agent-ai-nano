@@ -38,7 +38,7 @@ const ToolCall = ({ toolCall }) => {
   const arg = formatToolArgs(toolCall.arguments);
 
   return (
-    <Box flexDirection="row" paddingX={1} gap={1}>
+    <Box flexDirection="row" paddingX={1} gap={1} marginTop={1}>
       <Box>
         <Text>🔧</Text>
       </Box>

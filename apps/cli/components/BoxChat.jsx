@@ -9,11 +9,13 @@ import ToolCall from "./ToolCall.jsx";
 export default function BoxChat({ chat }) {
   return chat.map((value, index) => {
     if (value.role === "user") {
-      return <User key={index}>{value.content}</User>;
+      return <User key={index}>{value.content?.text ?? value.content}</User>;
     }
 
     if (value.role === "assistant") {
-      return <Response key={index} response={value.content} />;
+      return (
+        <Response key={index} response={value.content?.text ?? value.content} />
+      );
     }
 
     if (value.role === "tool_call") {

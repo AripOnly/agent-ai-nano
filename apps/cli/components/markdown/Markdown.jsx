@@ -1,9 +1,10 @@
 // apps/cli/components/Markdown.jsx
 
 import React, { useMemo } from "react";
-import { Box, Text, useWindowSize } from "ink";
+import { Box, Text } from "ink";
 import { marked } from "marked";
 import { highlightBlock, highlightInline, languageName } from "./monokai.js";
+import { useColumns } from "../../hooks/useColumns.js";
 
 const CODE_BG = "#272822";
 const CODE_TEXT = "#f8f8f2";
@@ -104,9 +105,15 @@ function renderCodeLine(line) {
 }
 
 export default function Markdown({ content, width }) {
-  const { columns: winColumns } = useWindowSize();
+  const winColumns = useColumns();
   const columns = width ?? winColumns ?? 80;
-  const tokens = useMemo(() => marked.lexer(content), [content]);
+  const tokens = useMemo(
+    () =>
+      marked.lexer(
+        typeof content === "string" ? content : (content?.text ?? ""),
+      ),
+    [content],
+  );
 
   function renderBlock(token, key) {
     switch (token.type) {

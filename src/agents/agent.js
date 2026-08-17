@@ -6,6 +6,7 @@ import { conversation } from "../session/conversation.js";
 import { EVENT } from "./event-type.js";
 import { agents } from "./registry.js";
 import { instruction } from "../prompts/instruction.js";
+import { tokenUsage } from "../usage/token-usage.js";
 
 export async function* agent({ name, prompt }) {
   try {
@@ -28,6 +29,10 @@ export async function* agent({ name, prompt }) {
 
     for await (const event of agentLoop(request)) {
       conversation.record(event);
+
+      if (event.role === EVENT.TOKEN) {
+        await tokenUsage.save(event.content);
+      }
 
       yield event;
     }

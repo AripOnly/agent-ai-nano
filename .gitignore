@@ -9,8 +9,7 @@ node_modules/
 config/settings.json
 
 # Storage
-storage/*.db
-storage/*.db-*
+storage/*
 
 # Logs
 *.log
