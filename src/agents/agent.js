@@ -8,13 +8,13 @@ import { agents } from "./registry.js";
 import { instruction } from "../prompts/instruction.js";
 import { tokenUsage } from "../usage/token-usage.js";
 
-export async function* agent({ name, prompt }) {
+export async function* agent({ name, prompt, session_id }) {
   try {
     const [provider, model] = await settings
       .get("model")
       .then((text) => text.split("/"));
 
-    const messages = conversation.getHistory();
+    const messages = conversation.getHistory(session_id);
     messages.push({ role: "user", content: { text: prompt } });
 
     const request = {
@@ -25,10 +25,10 @@ export async function* agent({ name, prompt }) {
       tools: agents[name].tools,
     };
 
-    conversation.start(prompt);
+    conversation.start(session_id, prompt);
 
     for await (const event of agentLoop(request)) {
-      conversation.record(event);
+      conversation.record(session_id, event);
 
       if (event.role === EVENT.TOKEN) {
         await tokenUsage.save(event.content);
@@ -37,7 +37,7 @@ export async function* agent({ name, prompt }) {
       yield event;
     }
 
-    conversation.commit();
+    conversation.commit(session_id);
   } catch (error) {
     yield {
       role: EVENT.ERROR,

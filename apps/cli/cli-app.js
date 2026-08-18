@@ -4,6 +4,10 @@ import { exit, stdin as input, stdout as output } from "node:process";
 
 import { agent } from "../../src/agents/agent.js";
 import { EVENT } from "../../src/agents/event-type.js";
+import {
+  conversation,
+  nameFromPrompt,
+} from "../../src/session/conversation.js";
 
 const rl = readline.createInterface({
   input,
@@ -50,6 +54,8 @@ async function chatCLI() {
   console.log("=== Chatbot Gemini ===");
   console.log("Type 'exit' to quit.\n");
 
+  let session = null;
+
   while (true) {
     console.log(`${COLOR.WHITE}====== User ====== ${COLOR.RESET}`);
     const userInput = await rl.question(`\n${COLOR.GREEN}User: ${COLOR.RESET}`);
@@ -61,7 +67,15 @@ async function chatCLI() {
     console.log(`\n${COLOR.WHITE}====== Nano ====== ${COLOR.RESET}`);
 
     try {
-      for await (const event of agent({ name: "nano", prompt: userInput })) {
+      if (!session) {
+        session = conversation.createSession(nameFromPrompt(userInput));
+      }
+
+      for await (const event of agent({
+        name: "nano",
+        prompt: userInput,
+        session_id: session.id,
+      })) {
         renderCLI(event);
       }
     } catch (error) {

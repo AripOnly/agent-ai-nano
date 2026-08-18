@@ -115,7 +115,9 @@ export default function Markdown({ content, width }) {
     [content],
   );
 
-  function renderBlock(token, key) {
+  function renderBlock(token, key, hasMargin = false) {
+    const margin = hasMargin ? 1 : 0;
+
     switch (token.type) {
       case "heading": {
         const depth = Math.min(Math.max(token.depth, 1), 6);
@@ -135,7 +137,7 @@ export default function Markdown({ content, width }) {
 
       case "paragraph":
         return (
-          <Box key={key} marginBottom={1}>
+          <Box key={key} marginBottom={margin}>
             <Inline tokens={token.tokens} />
           </Box>
         );
@@ -143,7 +145,7 @@ export default function Markdown({ content, width }) {
       case "list": {
         const markerWidth = token.ordered ? 3 : 2;
         return (
-          <Box key={key} marginBottom={1} flexDirection="column">
+          <Box key={key} marginBottom={margin} flexDirection="column">
             {token.items.map((item, j) => {
               const marker = token.ordered
                 ? `${j + 1}. `
@@ -157,26 +159,31 @@ export default function Markdown({ content, width }) {
                   ? "green"
                   : "gray"
                 : "#ffb86c";
+              const blocks = item.tokens.filter(
+                (blk) => blk.type !== "checkbox",
+              );
               return (
                 <Box key={j} flexDirection="row">
                   <Text color={markerColor}>{marker}</Text>
                   <Box flexDirection="column" width={columns - markerWidth - 4}>
-                    {item.tokens
-                      .filter((blk) => blk.type !== "checkbox")
-                      .map((blk, k) => {
-                        if (blk.type === "paragraph" || blk.type === "text") {
-                          return (
-                            <Inline
-                              key={k}
-                              dim={item.task && item.checked}
-                              tokens={
-                                blk.type === "paragraph" ? blk.tokens : [blk]
-                              }
-                            />
-                          );
-                        }
-                        return renderBlock(blk, k);
-                      })}
+                    {blocks.map((blk, k) => {
+                      if (blk.type === "paragraph" || blk.type === "text") {
+                        return (
+                          <Inline
+                            key={k}
+                            dim={item.task && item.checked}
+                            tokens={
+                              blk.type === "paragraph" ? blk.tokens : [blk]
+                            }
+                          />
+                        );
+                      }
+                      return renderBlock(
+                        blk,
+                        k,
+                        blocks[k + 1]?.type === "space",
+                      );
+                    })}
                   </Box>
                 </Box>
               );
@@ -190,7 +197,7 @@ export default function Markdown({ content, width }) {
           .map((blk) => (blk.type === "paragraph" ? blk.tokens : [blk]))
           .flat();
         return (
-          <Box key={key} marginBottom={1} flexDirection="column">
+          <Box key={key} marginBottom={margin} flexDirection="column">
             {splitLines(blocks).map((line, j) => (
               <Box key={j} flexDirection="row">
                 <Text color="yellow">│ </Text>
@@ -206,7 +213,7 @@ export default function Markdown({ content, width }) {
       case "code": {
         const lines = highlightBlock(token.text, token.lang);
         return (
-          <Box key={key} flexDirection="column" marginBottom={1}>
+          <Box key={key} flexDirection="column" marginBottom={margin}>
             {token.lang && (
               <Box flexDirection="row">
                 <Text color={LANG_LABEL} bold>
@@ -232,7 +239,7 @@ export default function Markdown({ content, width }) {
 
       case "hr":
         return (
-          <Box key={key} marginBottom={1}>
+          <Box key={key} marginBottom={margin}>
             <Text color="gray">{"─".repeat(columns)}</Text>
           </Box>
         );
@@ -242,7 +249,7 @@ export default function Markdown({ content, width }) {
 
       case "text":
         return (
-          <Box key={key} marginBottom={1}>
+          <Box key={key} marginBottom={margin}>
             <Inline tokens={token.tokens} />
           </Box>
         );
@@ -299,7 +306,7 @@ export default function Markdown({ content, width }) {
         );
 
         return (
-          <Box key={key} marginBottom={1} flexDirection="column">
+          <Box key={key} marginBottom={margin} flexDirection="column">
             <Text color="gray">{border("┌", "┬", "┐")}</Text>
             {renderRow(token.header, true, "h")}
             <Text color="gray">{border("├", "┼", "┤")}</Text>
@@ -313,13 +320,15 @@ export default function Markdown({ content, width }) {
         return null;
 
       default:
-        return <Box key={key} marginBottom={1}></Box>;
+        return <Box key={key} marginBottom={margin}></Box>;
     }
   }
 
   return (
     <Box flexDirection="column" width={columns}>
-      {tokens.map((t, i) => renderBlock(t, i))}
+      {tokens.map((t, i) =>
+        renderBlock(t, i, tokens[i + 1]?.type === "space"),
+      )}
     </Box>
   );
 }
