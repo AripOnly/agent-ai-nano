@@ -2,7 +2,7 @@
 
 import { settings } from "../config/setting.js";
 import { agentLoop } from "./agent-loop.js";
-import { conversation } from "../session/conversation.js";
+import { sessionStore } from "../session/session-store.js";
 import { EVENT } from "./event-type.js";
 import { agents } from "./registry.js";
 import { instruction } from "../prompts/instruction.js";
@@ -14,7 +14,7 @@ export async function* agent({ name, prompt, session_id }) {
       .get("model")
       .then((text) => text.split("/"));
 
-    const messages = conversation.getHistory(session_id);
+    const messages = sessionStore.getHistory(session_id);
     messages.push({ role: "user", content: { text: prompt } });
 
     const request = {
@@ -25,10 +25,10 @@ export async function* agent({ name, prompt, session_id }) {
       tools: agents[name].tools,
     };
 
-    conversation.start(session_id, prompt);
+    sessionStore.start(session_id, prompt);
 
     for await (const event of agentLoop(request)) {
-      conversation.record(session_id, event);
+      sessionStore.record(session_id, event);
 
       if (event.role === EVENT.TOKEN) {
         await tokenUsage.save(event.content);
@@ -37,7 +37,7 @@ export async function* agent({ name, prompt, session_id }) {
       yield event;
     }
 
-    conversation.commit(session_id);
+    sessionStore.commit(session_id);
   } catch (error) {
     yield {
       role: EVENT.ERROR,

@@ -35,7 +35,7 @@ export async function* agentLoop(request) {
 
         case EVENT.TOKEN:
           if (event.content.total_tokens > 1500) {
-            // console.log("\n\n[COMPACTION]");
+            console.log("\n\n[COMPACTION]");
           }
           break;
       }
@@ -46,7 +46,7 @@ export async function* agentLoop(request) {
     if (toolCall.length === 0) break;
 
     request.input.push({
-      reole: EVENT.ASSISTANT,
+      role: EVENT.ASSISTANT,
       content: { text: assistantText },
     });
 

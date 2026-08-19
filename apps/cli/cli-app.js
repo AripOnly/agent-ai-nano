@@ -5,9 +5,9 @@ import { exit, stdin as input, stdout as output } from "node:process";
 import { agent } from "../../src/agents/agent.js";
 import { EVENT } from "../../src/agents/event-type.js";
 import {
-  conversation,
+  sessionStore,
   nameFromPrompt,
-} from "../../src/session/conversation.js";
+} from "../../src/session/session-store.js";
 
 const rl = readline.createInterface({
   input,
@@ -68,7 +68,7 @@ async function chatCLI() {
 
     try {
       if (!session) {
-        session = conversation.createSession(nameFromPrompt(userInput));
+        session = sessionStore.createSession(nameFromPrompt(userInput));
       }
 
       for await (const event of agent({

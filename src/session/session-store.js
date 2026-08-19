@@ -1,4 +1,4 @@
-// src/session/conversation.js
+// src/session/session-store.js
 
 import sql from "./sql.js";
 import { randomUUID } from "node:crypto";
@@ -9,7 +9,7 @@ export function nameFromPrompt(prompt) {
   return words.length > 0 ? words.join(" ") : "session";
 }
 
-class Conversation {
+class SessionStore {
   constructor() {
     this.turns = new Map();
   }
@@ -118,4 +118,4 @@ class Conversation {
   }
 }
 
-export const conversation = new Conversation();
+export const sessionStore = new SessionStore();

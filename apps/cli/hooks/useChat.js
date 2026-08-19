@@ -2,9 +2,9 @@ import { useCallback, useEffect, useState } from "react";
 
 import { agent } from "../../../src/agents/agent.js";
 import {
-  conversation,
+  sessionStore,
   nameFromPrompt,
-} from "../../../src/session/conversation.js";
+} from "../../../src/session/session-store.js";
 
 export function useChat() {
   const [chat, setChat] = useState([]);
@@ -15,7 +15,7 @@ export function useChat() {
   const [sessions, setSessions] = useState([]);
 
   const refreshSessions = useCallback(() => {
-    setSessions(conversation.listSessions());
+    setSessions(sessionStore.listSessions());
   }, []);
 
   useEffect(() => {
@@ -23,7 +23,7 @@ export function useChat() {
   }, [refreshSessions]);
 
   const refreshHistory = useCallback(async (sessionId) => {
-    setHistory(await conversation.getHistory(sessionId));
+    setHistory(await sessionStore.getHistory(sessionId));
   }, []);
 
   const send = useCallback(
@@ -34,12 +34,12 @@ export function useChat() {
 
       try {
         if (!session) {
-          session = conversation.createSession(nameFromPrompt(prompt));
+          session = sessionStore.createSession(nameFromPrompt(prompt));
           console.clear();
           setActiveSession(session);
-        } else if (conversation.getHistory(session.id).length === 0) {
+        } else if (sessionStore.getHistory(session.id).length === 0) {
           const name = nameFromPrompt(prompt);
-          conversation.renameSession(session.id, name);
+          sessionStore.renameSession(session.id, name);
           setActiveSession({ ...session, name });
         }
       } catch (error) {
@@ -83,7 +83,7 @@ export function useChat() {
         setThinking(event.role === "reasoning_summary");
       }
 
-      const result = await conversation.getHistory(session.id);
+      const result = await sessionStore.getHistory(session.id);
       setHistory(result);
       setChat([]);
       setThinking(false);
@@ -105,7 +105,7 @@ export function useChat() {
 
   const switchSession = useCallback(
     (sessionId) => {
-      const session = conversation.getSessionById(sessionId);
+      const session = sessionStore.getSessionById(sessionId);
       if (!session) return;
       console.clear();
       setActiveSession(session);
@@ -120,7 +120,7 @@ export function useChat() {
   const deleteSession = useCallback(
     (sessionId) => {
       if (!sessionId) return;
-      conversation.deleteSession(sessionId);
+      sessionStore.deleteSession(sessionId);
       console.clear();
       setActiveSession(null);
       setChat([]);
@@ -136,7 +136,7 @@ export function useChat() {
     (sessionId, name) => {
       if (!name || !name.trim()) return;
       const finalName = name.trim();
-      conversation.renameSession(sessionId, finalName);
+      sessionStore.renameSession(sessionId, finalName);
       setActiveSession((prev) =>
         prev?.id === sessionId ? { ...prev, name: finalName } : prev,
       );
