@@ -1,16 +1,34 @@
 import { workEnv } from "./workEnv.js";
 import { readFile } from "fs/promises";
+import path from "path";
+import { fileURLToPath } from "url";
 
-export async function instruction(name) {
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+export async function instruction(name, options = {}) {
   const insDefault = await readFile(
-    `${process.cwd()}/src/prompts/${name}.txt`,
+    path.join(__dirname, `../prompts/${name}.txt`),
     "utf-8",
   );
 
+  let summary = "";
+
+  if (options?.summary) {
+    summary = `
+# Summary
+
+${options.summary}
+`;
+  }
+
   const ins = `
-  ${insDefault}
-  ${workEnv}
-  `;
+${insDefault}
+
+${workEnv}
+
+${summary}
+`;
 
   return ins;
 }

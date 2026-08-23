@@ -6,8 +6,6 @@ import { toolExecute } from "./tool-execute.js";
 import { toStr } from "../utils/tostr.js";
 
 export async function* agentLoop(request) {
-  // console.log(request);
-  // return;
   const provider = llm[request.provider];
 
   if (!provider) {
@@ -18,6 +16,7 @@ export async function* agentLoop(request) {
     let toolCall = [];
     let reasoningSignature = "";
     let assistantText = "";
+    let token = 0;
 
     for await (const event of provider.request(request)) {
       switch (event.role) {
@@ -34,9 +33,7 @@ export async function* agentLoop(request) {
           break;
 
         case EVENT.TOKEN:
-          if (event.content.total_tokens > 1500) {
-            console.log("\n\n[COMPACTION]");
-          }
+          token = event.content.total_tokens;
           break;
       }
 
@@ -45,10 +42,12 @@ export async function* agentLoop(request) {
 
     if (toolCall.length === 0) break;
 
-    request.input.push({
-      role: EVENT.ASSISTANT,
-      content: { text: assistantText },
-    });
+    if (assistantText) {
+      request.input.push({
+        role: EVENT.ASSISTANT,
+        content: { text: assistantText },
+      });
+    }
 
     const results = await Promise.all(toolCall.map((tc) => toolExecute(tc)));
 

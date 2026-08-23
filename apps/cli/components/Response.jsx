@@ -1,4 +1,3 @@
-import React from "react";
 import { Box, Text } from "ink";
 import MarkdownRenderer from "./markdown/Markdown.jsx";
 import { useColumns } from "../hooks/useColumns.js";

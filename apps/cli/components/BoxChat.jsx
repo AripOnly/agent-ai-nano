@@ -22,6 +22,12 @@ export default function BoxChat({ chat }) {
       return <ToolCall key={index} toolCall={value.content} />;
     }
 
+    if (value.role === "compaction") {
+      return (
+        <Response key={index} response={value.content?.text ?? value.content} />
+      );
+    }
+
     if (value.role === "error") {
       return (
         <Text key={index} color="red">

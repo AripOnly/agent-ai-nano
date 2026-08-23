@@ -23,7 +23,14 @@ export function useChat() {
   }, [refreshSessions]);
 
   const refreshHistory = useCallback(async (sessionId) => {
-    setHistory(await sessionStore.getHistory(sessionId));
+    const session = sessionStore.getSessionById(sessionId);
+    const history = await sessionStore.getHistory(sessionId);
+
+    setHistory(
+      session?.summary
+        ? [{ role: "compaction", content: { text: session.summary } }, ...history]
+        : history,
+    );
   }, []);
 
   const send = useCallback(
@@ -80,11 +87,20 @@ export function useChat() {
           setChat((prev) => [...prev, event]);
         }
 
+        if (event.role === "compaction") {
+          setChat((prev) => [...prev, event]);
+        }
+
         setThinking(event.role === "reasoning_summary");
       }
 
       const result = await sessionStore.getHistory(session.id);
-      setHistory(result);
+      const sessionRow = sessionStore.getSessionById(session.id);
+      setHistory(
+        sessionRow?.summary
+          ? [{ role: "compaction", content: { text: sessionRow.summary } }, ...result]
+          : result,
+      );
       setChat([]);
       setThinking(false);
       setLoading(false);

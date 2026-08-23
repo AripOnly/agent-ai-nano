@@ -3,11 +3,19 @@ import "dotenv/config";
 import { stream } from "./stream.js";
 import { EVENT } from "../../../agents/event-type.js";
 import { settings } from "../../../config/setting.js";
-import { toStr } from "../../../utils/tostr.js";
 
-const client = new GoogleGenAI({
-  apiKey: await settings.get("apiKey"),
-});
+let client = null;
+
+async function getClient() {
+  if (!client) {
+    const apiKey = await settings.get("apiKey");
+    if (!apiKey) {
+      throw new Error("API key not configured. Run setup first.");
+    }
+    client = new GoogleGenAI({ apiKey });
+  }
+  return client;
+}
 
 function toGemini(part) {
   const role = part.role ?? "text";
@@ -70,21 +78,19 @@ function toGemini(part) {
 
 export async function* request(request) {
   try {
+    const client = await getClient();
+
     const input = request.input.map(toGemini).filter((part) => part != null);
-    // console.log(JSON.stringify(input, null, 2));
-    // console.log(input);
-    // return;
 
     const body = {
       model: request.model,
-      input,
+      input: input,
       system_instruction: request.instruction,
       tools: request.tools,
       store: false,
       stream: true,
       generation_config: {
         temperature: 1.0,
-        thinking_level: "low",
         thinking_summaries: "auto",
       },
     };
@@ -114,7 +120,6 @@ export async function* request(request) {
       role: EVENT.ERROR,
       content: {
         message: `error: ${err}\nmessage: ${message}`,
-        // message: err.stack,
       },
     };
   }

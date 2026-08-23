@@ -153,10 +153,10 @@ const WebSearch = {
   name: "WebSearch",
   description: "Search the web for up-to-date information.",
   parameters: {
-    type: "OBJECT",
+    type: "object",
     properties: {
       query: {
-        type: "STRING",
+        type: "string",
         description: "The search query.",
       },
     },
@@ -169,10 +169,10 @@ const WebScrape = {
   name: "WebScrape",
   description: "Retrieve and extract the markdown content of a web page.",
   parameters: {
-    type: "OBJECT",
+    type: "object",
     properties: {
       url: {
-        type: "STRING",
+        type: "string",
         description: "The URL of the web page to scrape.",
       },
     },

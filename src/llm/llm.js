@@ -3,5 +3,8 @@
 import * as google from "./providers/google/google.js";
 
 export const llm = {
-  google,
+  google: {
+    request: google.request,
+    feed: google.feed,
+  },
 };

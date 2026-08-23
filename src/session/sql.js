@@ -28,4 +28,14 @@ sql.exec(`
   CREATE INDEX IF NOT EXISTS idx_turn_session ON turn(session_id);
 `);
 
+const sessionColumns = sql.prepare("PRAGMA table_info(session)").all();
+
+if (!sessionColumns.some((column) => column.name === "summary")) {
+  sql.exec("ALTER TABLE session ADD COLUMN summary TEXT");
+}
+
+if (!sessionColumns.some((column) => column.name === "token")) {
+  sql.exec("ALTER TABLE session ADD COLUMN token INTEGER");
+}
+
 export default sql;

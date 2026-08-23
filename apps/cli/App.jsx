@@ -10,7 +10,7 @@ import PromptInput from "./components/PromptInput.jsx";
 import Spinner from "./components/Spinner.jsx";
 import BoxChat from "./components/BoxChat.jsx";
 import Thinking from "./components/Thinking.jsx";
-import { tokenUsage } from "../../src/usage/token-usage.js";
+import { sessionStore } from "../../src/session/session-store.js";
 import { settings } from "../../src/config/setting.js";
 
 export default function App() {
@@ -51,13 +51,13 @@ export default function App() {
   );
 
   useEffect(() => {
-    async function getTokens() {
-      const tokens = await tokenUsage.get();
-      setToken(tokens.total_tokens);
+    if (!activeSession?.id) {
+      setToken(0);
+      return;
     }
-
-    getTokens();
-  }, [history]);
+    const session = sessionStore.getSessionById(activeSession.id);
+    setToken(session?.token ?? 0);
+  }, [history, activeSession?.id]);
 
   return (
     <>

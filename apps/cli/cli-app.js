@@ -38,10 +38,8 @@ function renderCLI(event) {
       `\n${COLOR.YELLOW}${event.content.name}: ${Object.values(event.content.arguments)}${COLOR.RESET}`,
     );
   }
-  if (event.role === EVENT.TOKEN) {
-    process.stdout.write(
-      `\n${COLOR.GRAY}Tokens: ${JSON.stringify(event.content.total_tokens, null, 2)}${COLOR.RESET}\n`,
-    );
+  if (event.role === EVENT.COMPACTION) {
+    process.stdout.write(`\n${COLOR.GRAY}[COMPACTION] context dipadatkan${COLOR.RESET}`);
   }
   if (event.role === EVENT.ERROR) {
     process.stdout.write(
@@ -78,6 +76,11 @@ async function chatCLI() {
       })) {
         renderCLI(event);
       }
+
+      const row = sessionStore.getSessionById(session.id);
+      process.stdout.write(
+        `\n${COLOR.GRAY}Tokens: ${row?.token ?? 0}${COLOR.RESET}\n`,
+      );
     } catch (error) {
       console.error(`\n${COLOR.RED}[ERROR]: ${error.stack}${COLOR.RESET}`);
     }

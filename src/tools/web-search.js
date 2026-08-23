@@ -1,9 +1,21 @@
 import { settings } from "../config/setting.js";
 
-const apiKey = await settings.get("serper_api_key");
+let apiKey = null;
+
+async function getApiKey() {
+  if (!apiKey) {
+    apiKey = await settings.get("serper_api_key");
+  }
+  return apiKey;
+}
 
 export async function WebSearch({ query }) {
   try {
+    const apiKey = await getApiKey();
+    if (!apiKey) {
+      return { success: false, error: "Serper API key not configured" };
+    }
+
     const response = await fetch("https://google.serper.dev/search", {
       method: "POST",
       headers: {
@@ -51,6 +63,11 @@ export async function WebSearch({ query }) {
 
 export async function WebScrape({ url }) {
   try {
+    const apiKey = await getApiKey();
+    if (!apiKey) {
+      return { success: false, error: "Serper API key not configured" };
+    }
+
     const response = await fetch("https://scrape.serper.dev", {
       method: "POST",
       headers: {
