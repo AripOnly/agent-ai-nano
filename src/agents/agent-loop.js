@@ -4,6 +4,8 @@ import { EVENT } from "./event-type.js";
 import { llm } from "../llm/llm.js";
 import { toolExecute } from "./tool-execute.js";
 import { toStr } from "../utils/tostr.js";
+import { compaction, checkCompaction } from "./compaction.js";
+import { sessionStore } from "../session/session-store.js";
 
 export async function* agentLoop(request) {
   const provider = llm[request.provider];
@@ -17,6 +19,7 @@ export async function* agentLoop(request) {
     let reasoningSignature = "";
     let assistantText = "";
     let token = 0;
+    let summary = "";
 
     for await (const event of provider.request(request)) {
       switch (event.role) {
@@ -72,5 +75,35 @@ export async function* agentLoop(request) {
         toolResult: results.map(toStr),
       }),
     );
+
+    if (checkCompaction({ model: request.model, token })) {
+      let compact = compaction({
+        history: request.input,
+        provider: request.provider,
+        model: request.model,
+        session_id: request.session_id,
+      });
+
+      for await (let event of compact) {
+        if (event.role === EVENT.ASSISTANT) {
+          summary += event.content.text;
+          yield {
+            role: EVENT.COMPACTION,
+            content: { text: event.content.text },
+          };
+        }
+
+        if (event.role === EVENT.ERROR) {
+          yield event;
+        }
+      }
+
+      request.instruction = request.instruction + "\n\n" + summary;
+      request.input.push({
+        role: EVENT.COMPACTION,
+        content: { text: summary.trim() },
+      });
+      request.input = sessionStore.pruneHistory(request.input);
+    }
   }
 }

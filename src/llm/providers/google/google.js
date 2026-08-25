@@ -20,7 +20,8 @@ async function getClient() {
 function toGemini(part) {
   const role = part.role ?? "text";
 
-  if (role === EVENT.TOKEN || role === EVENT.ERROR) return null;
+  if (role === EVENT.TOKEN || role === EVENT.ERROR || role === EVENT.COMPACTION)
+    return null;
 
   if (role === EVENT.REASONING_SIGNATURE) {
     const thought = {

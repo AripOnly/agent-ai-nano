@@ -1,6 +1,6 @@
 export const workEnv = `
 ## Work Environment
 
-- Operating: ${process.platform}
-- Current Working Directory: ${process.cwd()}
+- Operating System: ${process.platform}
+- Your Current Location: ${process.cwd()}
 `;

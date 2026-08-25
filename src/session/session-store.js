@@ -114,41 +114,30 @@ class SessionStore {
     return history;
   }
 
-  historyPruningCheck(sessionId) {
-    const rows = this.getHistory(sessionId, true);
+  pruneHistory(history = []) {
+    const userIndexes = [];
 
-    const compactionIndex = rows.findLastIndex((row) => {
-      const parts = JSON.parse(row.parts);
+    const lastCompactionIndex = history.findLastIndex(
+      (event) => event.role === EVENT.COMPACTION,
+    );
 
-      return parts.some((event) => event.role === EVENT.COMPACTION);
-    });
-
-    // No compaction exists, return the complete history.
-    if (compactionIndex === -1) {
-      return rows.flatMap((row) => JSON.parse(row.parts));
+    if (lastCompactionIndex === -1) {
+      return history;
     }
 
-    // Keep the last two turns before compaction.
-    const start = Math.max(0, compactionIndex - 2);
-
-    // Include the two previous turns and all turns after compaction.
-    const selectedRows = rows.slice(start);
-
-    const history = [];
-
-    for (const row of selectedRows) {
-      const parts = JSON.parse(row.parts);
-
-      for (const part of parts) {
-        // The compaction summary is stored in the database
-        // but should not be sent as a normal history event.
-        if (part.role === EVENT.COMPACTION) continue;
-
-        history.push(part);
+    for (let i = 0; i < lastCompactionIndex; i++) {
+      if (history[i]?.role === EVENT.USER) {
+        userIndexes.push(i);
       }
     }
 
-    return history;
+    const keepUserIndexes = userIndexes.slice(-2);
+
+    if (keepUserIndexes.length < 2) {
+      return history;
+    }
+
+    return history.slice(keepUserIndexes[0]);
   }
 
   listSessions() {

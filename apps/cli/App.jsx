@@ -11,7 +11,6 @@ import Spinner from "./components/Spinner.jsx";
 import BoxChat from "./components/BoxChat.jsx";
 import Thinking from "./components/Thinking.jsx";
 import { sessionStore } from "../../src/session/session-store.js";
-import { settings } from "../../src/config/setting.js";
 
 export default function App() {
   const columns = useColumns();
@@ -30,8 +29,6 @@ export default function App() {
     renameSession,
   } = useChat();
   const [token, setToken] = useState(0);
-  const [clear, setClear] = useState();
-  const [trig, setTrig] = useState(null);
 
   const header = (
     <Header key={`h-${activeSession?.id ?? "new"}`} columns={columns} />
@@ -42,8 +39,8 @@ export default function App() {
   ));
 
   const boxLoading = (
-    <Text color="#3A86FF">
-      <Text color="#3A86FF">
+    <Text color="#FFA500">
+      <Text color="#FFA500">
         <Spinner type="dotsCircle" />
       </Text>
       {" Loading..."}

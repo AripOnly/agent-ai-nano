@@ -1,10 +1,16 @@
+import React from "react";
 import { Box, Text } from "ink";
 import MarkdownRenderer from "./markdown/Markdown.jsx";
 import { useColumns } from "../hooks/useColumns.js";
 
-const Response = ({ response }) => {
+const Response = ({ response, type }) => {
   const columns = useColumns();
   const markdownWidth = Math.max(columns - 6, 10);
+
+  const icon = {
+    assistant: "🤖",
+    compaction: "🗜️",
+  };
 
   return (
     <Box
@@ -15,7 +21,7 @@ const Response = ({ response }) => {
       marginLeft={1}
     >
       <Box flexShrink={0}>
-        <Text>🤖</Text>
+        <Text>{icon[type]}</Text>
       </Box>
       <Box width={markdownWidth}>
         <MarkdownRenderer content={response} width={markdownWidth} />

@@ -14,7 +14,11 @@ export default function BoxChat({ chat }) {
 
     if (value.role === "assistant") {
       return (
-        <Response key={index} response={value.content?.text ?? value.content} />
+        <Response
+          key={index}
+          type="assistant"
+          response={value.content?.text ?? value.content}
+        />
       );
     }
 
@@ -24,7 +28,11 @@ export default function BoxChat({ chat }) {
 
     if (value.role === "compaction") {
       return (
-        <Response key={index} response={value.content?.text ?? value.content} />
+        <Response
+          key={index}
+          type="compaction"
+          response={value.content?.text ?? value.content}
+        />
       );
     }
 

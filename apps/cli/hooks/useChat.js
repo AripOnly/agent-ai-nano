@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 import { agent } from "../../../src/agents/agent.js";
 import {
@@ -23,14 +23,9 @@ export function useChat() {
   }, [refreshSessions]);
 
   const refreshHistory = useCallback(async (sessionId) => {
-    const session = sessionStore.getSessionById(sessionId);
     const history = await sessionStore.getHistory(sessionId);
 
-    setHistory(
-      session?.summary
-        ? [{ role: "compaction", content: { text: session.summary } }, ...history]
-        : history,
-    );
+    setHistory(history);
   }, []);
 
   const send = useCallback(
@@ -88,19 +83,26 @@ export function useChat() {
         }
 
         if (event.role === "compaction") {
-          setChat((prev) => [...prev, event]);
+          setChat((prev) => {
+            const text = event.content?.text ?? "";
+            const next = [...prev];
+            const last = next[next.length - 1];
+
+            if (last?.role === "compaction") {
+              last.content += text;
+            } else {
+              next.push({ role: "compaction", content: text });
+            }
+
+            return next;
+          });
         }
 
         setThinking(event.role === "reasoning_summary");
       }
 
       const result = await sessionStore.getHistory(session.id);
-      const sessionRow = sessionStore.getSessionById(session.id);
-      setHistory(
-        sessionRow?.summary
-          ? [{ role: "compaction", content: { text: sessionRow.summary } }, ...result]
-          : result,
-      );
+      setHistory(result);
       setChat([]);
       setThinking(false);
       setLoading(false);
