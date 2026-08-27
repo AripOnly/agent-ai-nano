@@ -8,7 +8,7 @@ let client = null;
 
 async function getClient() {
   if (!client) {
-    const apiKey = await settings.get("apiKey");
+    const apiKey = await settings.get("api_key");
     if (!apiKey) {
       throw new Error("API key not configured. Run setup first.");
     }

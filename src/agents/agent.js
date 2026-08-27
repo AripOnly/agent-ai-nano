@@ -19,11 +19,11 @@ export async function* agent({ name, prompt, session_id }) {
       throw new Error(`Session ${session_id} not found`);
     }
 
-    let { token } = session;
+    let token = session.token ?? 0;
     let history = [];
 
     // compaction check
-    if (checkCompaction({ model, token })) {
+    if (await checkCompaction({ model, token })) {
       history = sessionStore.getHistory(session_id);
 
       for await (const event of compaction({
@@ -62,7 +62,6 @@ export async function* agent({ name, prompt, session_id }) {
     };
 
     sessionStore.start(session_id, EVENT.USER, prompt);
-
     for await (const event of agentLoop(request)) {
       if (event.role !== EVENT.COMPACTION) {
         sessionStore.record(session_id, event);

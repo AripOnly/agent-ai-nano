@@ -1,16 +1,23 @@
 // src/tools/tools.js
 
-import { Read } from "./read.js";
-import { Write } from "./write.js";
-import { Run } from "./run.js";
-import { schema } from "./schema.js";
-import { WebSearch, WebScrape } from "./web-search.js";
+import { read, readTool } from "./read.js";
+import { write, writeTool } from "./write.js";
+import { webSearch, webSearchTool } from "./web-search.js";
+import { webFetch, webFetchTool } from "./web-fetch.js";
+import { shell, shellTool } from "./shell/shell.js";
 
 export const tools = {
-  Read,
-  Write,
-  Run,
-  WebSearch,
-  WebScrape,
-  schema,
+  read,
+  write,
+  shell,
+  webSearch,
+  webFetch,
+};
+
+export const schema = {
+  readTool,
+  writeTool,
+  shellTool,
+  webSearchTool,
+  webFetchTool,
 };

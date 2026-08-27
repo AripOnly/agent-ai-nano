@@ -6,23 +6,25 @@ import { EVENT } from "./event-type.js";
 import { sessionStore } from "../session/session-store.js";
 import models from "../llm/providers/google/models.js";
 import { agents } from "./registry.js";
+import { settings } from "../config/setting.js";
 
-const COMPACTION_RATIO = 0.02;
-const KEEP_TURNS = 2;
+export async function checkCompaction({ model, token = null }) {
+  const { ratio } = await settings.get("compaction");
 
-export function checkCompaction({ model, token = null }) {
   const modelLimit = models.find((m) => m.id === model)?.context;
 
   if (!modelLimit) {
     return false;
   }
 
-  return (token ?? 0) > modelLimit * COMPACTION_RATIO;
+  return (token ?? 0) > modelLimit * (ratio / 100);
 }
 
 export async function* compaction({ history, session_id, provider, model }) {
+  const { keep_turn } = await settings.get("compaction");
+
   // There is nothing to compact if there are not enough turns.
-  if (history.length <= KEEP_TURNS) {
+  if (history.length <= keep_turn) {
     return null;
   }
 
@@ -42,9 +44,9 @@ export async function* compaction({ history, session_id, provider, model }) {
     }
   }
 
-  const keepUserIndexes = userIndexes.slice(-KEEP_TURNS);
+  const keepUserIndexes = userIndexes.slice(-keep_turn);
 
-  if (keepUserIndexes.length < KEEP_TURNS) {
+  if (keepUserIndexes.length < keep_turn) {
     return null;
   }
 

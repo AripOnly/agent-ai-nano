@@ -1,15 +1,37 @@
 import fs from "fs/promises";
 import path from "path";
 
-/**
- * Tool Read
- *
- * @param {Object} params
- * @param {string} params.path
- * @param {number} [params.start_line]
- * @param {number} [params.end_line]
- */
-export async function Read({ path: filePath, start_line, end_line }) {
+export const readTool = {
+  type: "function",
+  name: "read",
+  description:
+    "Read a UTF-8 text file from the workspace. Never use this tool for images or binary files. Use this tool whenever the user asks to view, inspect, analyze, summarize, debug, search, or quote the contents of a local file. If only part of a file is needed, provide start_line and end_line. Never request more than 200 lines in one call.",
+
+  parameters: {
+    type: "object",
+    additionalProperties: false,
+    properties: {
+      path: {
+        type: "string",
+        description:
+          "Relative path inside the workspace, for example: src/index.js",
+      },
+      start_line: {
+        type: "integer",
+        minimum: 1,
+        description: "First line to read (1-based).",
+      },
+      end_line: {
+        type: "integer",
+        minimum: 1,
+        description: "Last line to read (1-based). Maximum 200 lines.",
+      },
+    },
+    required: ["path"],
+  },
+};
+
+export async function read({ path: filePath, start_line, end_line }) {
   try {
     if (typeof filePath !== "string" || filePath.trim() === "") {
       return {

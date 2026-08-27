@@ -1,21 +1,21 @@
-import { tools } from "../tools/tools.js";
+import { schema } from "../tools/tools.js";
 
 const nano = {
   mode: "primary",
   instruction: "default",
   tools: [
-    tools.schema.Read,
-    tools.schema.Write,
-    tools.schema.Run,
-    tools.schema.WebScrape,
-    tools.schema.WebSearch,
+    schema.readTool,
+    schema.writeTool,
+    schema.shellTool,
+    schema.webSearchTool,
+    schema.webFetchTool,
   ],
 };
 
 const plan = {
   mode: "primary",
   instruction: "plan",
-  tools: [tools.schema.Read, tools.schema.WebScrape, tools.schema.WebSearch],
+  tools: [schema.readTool, schema.webSearchTool, schema.webFetchTool],
 };
 
 const compaction = {

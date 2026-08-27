@@ -2,7 +2,7 @@
 
 import { tools } from "../tools/tools.js";
 
-export async function toolExecute(tool) {
+export async function toolExecute(tool, context = {}) {
   const { name, arguments: rawArgument } = tool;
 
   if (!(name in tools)) {
@@ -16,11 +16,11 @@ export async function toolExecute(tool) {
     const args =
       typeof rawArgument === "string" ? JSON.parse(rawArgument) : rawArgument;
 
-    return await tools[name](args);
+    return await tools[name](args, context);
   } catch (error) {
     return {
       success: false,
-      error: error.message,
+      error: error instanceof Error ? error.message : String(error),
     };
   }
 }

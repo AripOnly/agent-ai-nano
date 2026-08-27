@@ -18,11 +18,14 @@ async function load() {
     if (error.code === "ENOENT") {
       const data = JSON.stringify(
         {
-          username: null,
-          provider: null,
-          model: null,
-          apiKey: null,
+          username: "youre name",
+          model: "google/gemini-3.1-flas-lite",
+          api_key: null,
           serper_api_key: null,
+          compaction: {
+            ratio: 85,
+            keep_turn: 2,
+          },
         },
         null,
         2,

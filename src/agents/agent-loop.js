@@ -76,7 +76,7 @@ export async function* agentLoop(request) {
       }),
     );
 
-    if (checkCompaction({ model: request.model, token })) {
+    if (await checkCompaction({ model: request.model, token })) {
       let compact = compaction({
         history: request.input,
         provider: request.provider,

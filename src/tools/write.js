@@ -1,6 +1,66 @@
 import fs from "fs/promises";
 import path from "path";
 
+export const writeTool = {
+  type: "function",
+  name: "write",
+
+  description: `
+Create, overwrite, edit, or insert text into a UTF-8 file in the workspace.
+
+Use OVERWRITE
+- when creating a new file.
+- when replacing the entire file.
+
+Use LINE_EDIT
+- when the user wants to modify existing lines.
+- start_line and end_line are required.
+- maximum editable range is 200 lines.
+
+Use INSERT
+- when the user explicitly asks to insert or add lines.
+- start_line is required.
+- existing lines must remain unchanged.
+
+The tool automatically prevents path traversal and writing outside the workspace.
+`,
+
+  parameters: {
+    type: "object",
+
+    properties: {
+      path: {
+        type: "string",
+        description: "Relative file path.",
+      },
+
+      content: {
+        type: "string",
+        description: "Text that will be written.",
+      },
+
+      mode: {
+        type: "string",
+        enum: ["OVERWRITE", "LINE_EDIT", "INSERT"],
+      },
+
+      start_line: {
+        type: "integer",
+        minimum: 1,
+        description: "Required for LINE_EDIT and INSERT.",
+      },
+
+      end_line: {
+        type: "integer",
+        minimum: 1,
+        description: "Required only for LINE_EDIT.",
+      },
+    },
+
+    required: ["path", "content", "mode"],
+  },
+};
+
 const MODE = Object.freeze({
   OVERWRITE: "OVERWRITE",
   LINE_EDIT: "LINE_EDIT",
@@ -88,7 +148,7 @@ function normalizeContent(content) {
   return content.replace(/\r?\n$/, "").split(/\r?\n/);
 }
 
-export async function Write({
+export async function write({
   path: filePath,
   content,
   mode,
