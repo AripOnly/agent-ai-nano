@@ -1,3 +1,0 @@
-Ini adalah file tes untuk mencoba tool write.
-Status: Berhasil.
-Tanggal: 2024-05-22

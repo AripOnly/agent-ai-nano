@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Box, useApp, Static, Text } from "ink";
 
 import { useChat } from "./hooks/useChat.js";
+import { useConfig } from "./hooks/useConfig.js";
 import { useColumns } from "./hooks/useColumns.js";
 import Header from "./components/Header.jsx";
 import PromptInput from "./components/PromptInput.jsx";
@@ -28,6 +29,8 @@ export default function App() {
     deleteSession,
     renameSession,
   } = useChat();
+
+  const { provider, model, models, switchModel } = useConfig();
   const [token, setToken] = useState(0);
 
   const header = (
@@ -83,6 +86,9 @@ export default function App() {
           onDeleteSession={deleteSession}
           onRenameSession={renameSession}
           sessions={sessions}
+          provider={provider}
+          models={models}
+          onSwitchModel={switchModel}
         />
 
         <Box
@@ -101,7 +107,9 @@ export default function App() {
             <Text>|</Text>
             <Text>agent: Nano</Text>
             <Text>|</Text>
-            <Text>model: gemini/gemini-3.1-flash-lite</Text>
+            <Text>
+              model: {provider}/{model}
+            </Text>
           </Box>
         </Box>
       </Box>

@@ -6,6 +6,7 @@ import TextInput from "ink-text-input";
 import CommandBox from "./CommandBox.jsx";
 import SessionList from "./SessionList.jsx";
 import SelectInput from "./SelectInput.jsx";
+import ModelList from "./ModelList.jsx";
 
 const SESSION_ACTIONS = [
   { value: "select", label: "select" },
@@ -21,6 +22,9 @@ const PromptInput = ({
   onDeleteSession,
   onRenameSession,
   sessions = [],
+  provider = "",
+  models,
+  onSwitchModel,
 }) => {
   const [input, setInput] = useState("");
   const [mode, setMode] = useState("text"); // "text" | "command" | "session" | "sessionActions" | "sessionRename"
@@ -77,6 +81,10 @@ const PromptInput = ({
     if (item.value === "session") {
       setMode("session");
     }
+
+    if (item.value === "model") {
+      setMode("model");
+    }
   };
 
   const cancel = () => {
@@ -121,8 +129,12 @@ const PromptInput = ({
     setMode("session");
   };
 
+  const handleSwitchModel = (model) => {
+    onSwitchModel(model.value);
+    reset();
+  };
+
   return (
-    // <Box flexDirection="column" borderStyle={"round"} borderColor={"#363737"}>
     <Box
       flexDirection="column"
       backgroundColor={"#212121"}
@@ -190,6 +202,19 @@ const PromptInput = ({
                 onSubmit={handleRename}
               />
             </Box>
+          </Box>
+        </Box>
+      )}
+
+      {mode === "model" && (
+        <Box justifyContent="center" marginTop={1} paddingX={1}>
+          <Box width={"100%"}>
+            <ModelList
+              provider={provider}
+              models={models}
+              onSelect={handleSwitchModel}
+              onCancel={cancel}
+            />
           </Box>
         </Box>
       )}
