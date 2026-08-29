@@ -1,7 +1,7 @@
 // src/agents/compaction.js
 
 import { llm } from "../llm/llm.js";
-import { instruction } from "../prompts/instruction.js";
+import { createInstruction } from "../prompts/createInstruction.js";
 import { EVENT } from "./event-type.js";
 import { sessionStore } from "../session/session-store.js";
 import models from "../llm/providers/google/models.js";
@@ -61,7 +61,7 @@ export async function* compaction({ history, session_id, provider, model }) {
   const request = {
     provider,
     model,
-    instruction: await instruction(compaction.instruction),
+    instruction: await createInstruction(compaction.instruction),
     input: [
       ...(oldSummary
         ? [

@@ -1,3 +1,5 @@
+// src/agents/registry.js
+
 import { schema } from "../tools/tools.js";
 
 const nano = {

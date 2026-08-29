@@ -7,7 +7,7 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export async function instruction(name, options = {}) {
+export async function createInstruction(name, options = {}) {
   const username = await settings.get("username");
 
   const insDefault = await readFile(

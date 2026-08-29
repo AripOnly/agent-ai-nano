@@ -5,14 +5,12 @@ import { agentLoop } from "./agent-loop.js";
 import { sessionStore } from "../session/session-store.js";
 import { EVENT } from "./event-type.js";
 import { agents } from "./registry.js";
-import { instruction } from "../prompts/instruction.js";
+import { createInstruction } from "../prompts/createInstruction.js";
 import { compaction, checkCompaction } from "./compaction.js";
 
 export async function* agent({ name, prompt, session_id }) {
   try {
     const [provider, model] = (await settings.get("model")).split("/");
-
-    // get session
     const session = sessionStore.getSessionById(session_id);
 
     if (!session) {
@@ -20,12 +18,11 @@ export async function* agent({ name, prompt, session_id }) {
     }
 
     let token = session.token ?? 0;
-    let history = [];
+    let { summary } = sessionStore.getSessionById(session_id) ?? "";
+    let history = sessionStore.getHistory(session_id);
+    let resultCompaction = "";
 
-    // compaction check
     if (await checkCompaction({ model, token })) {
-      history = sessionStore.getHistory(session_id);
-
       for await (const event of compaction({
         history,
         session_id,
@@ -33,6 +30,7 @@ export async function* agent({ name, prompt, session_id }) {
         model,
       })) {
         if (event.role === EVENT.ASSISTANT) {
+          resultCompaction += event.content.text;
           yield {
             role: EVENT.COMPACTION,
             content: { text: event.content.text },
@@ -45,27 +43,31 @@ export async function* agent({ name, prompt, session_id }) {
       }
     }
 
-    history = sessionStore.getHistory(session_id);
-    let messages = sessionStore.pruneHistory(history);
-    messages.push({ role: EVENT.USER, content: { text: prompt } });
+    history.push({ role: EVENT.USER, content: { text: prompt } });
 
-    const { summary } = sessionStore.getSessionById(session_id);
+    if (resultCompaction) {
+      summary = resultCompaction.trim();
+      history.push({ role: EVENT.COMPACTION, content: resultCompaction });
+    }
 
-    const baseIns = await instruction(agents[name].instruction, { summary });
+    const instruction = await createInstruction(agents[name].instruction, {
+      summary,
+    });
+
+    let input = sessionStore.pruneHistory(history);
+
     const request = {
       provider,
       model,
-      instruction: baseIns,
-      input: messages,
+      instruction,
+      input,
       tools: agents[name].tools,
       session_id,
     };
 
     sessionStore.start(session_id, EVENT.USER, prompt);
     for await (const event of agentLoop(request)) {
-      if (event.role !== EVENT.COMPACTION) {
-        sessionStore.record(session_id, event);
-      }
+      sessionStore.record(session_id, event);
 
       if (event.role === EVENT.TOKEN) {
         token = event.content.total_tokens;

@@ -12,6 +12,8 @@ const Response = ({ response, type }) => {
     compaction: "🗜️",
   };
 
+  const bgColor = type === "compaction" ? "#202020" : "";
+
   return (
     <Box
       flexDirection="row"
@@ -23,7 +25,7 @@ const Response = ({ response, type }) => {
       <Box flexShrink={0}>
         <Text>{icon[type]}</Text>
       </Box>
-      <Box width={markdownWidth}>
+      <Box width={markdownWidth} backgroundColor={bgColor}>
         <MarkdownRenderer content={response} width={markdownWidth} />
       </Box>
     </Box>

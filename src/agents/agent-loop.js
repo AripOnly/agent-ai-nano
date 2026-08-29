@@ -19,7 +19,7 @@ export async function* agentLoop(request) {
     let reasoningSignature = "";
     let assistantText = "";
     let token = 0;
-    let summary = "";
+    let resultCompaction = "";
 
     for await (const event of provider.request(request)) {
       switch (event.role) {
@@ -86,7 +86,7 @@ export async function* agentLoop(request) {
 
       for await (let event of compact) {
         if (event.role === EVENT.ASSISTANT) {
-          summary += event.content.text;
+          resultCompaction += event.content.text;
           yield {
             role: EVENT.COMPACTION,
             content: { text: event.content.text },
@@ -98,10 +98,12 @@ export async function* agentLoop(request) {
         }
       }
 
-      request.instruction = request.instruction + "\n\n" + summary;
+      request.instruction =
+        request.instruction + "\n\n" + resultCompaction.trim();
+
       request.input.push({
         role: EVENT.COMPACTION,
-        content: { text: summary.trim() },
+        content: { text: resultCompaction.trim() },
       });
       request.input = sessionStore.pruneHistory(request.input);
     }

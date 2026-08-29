@@ -56,13 +56,38 @@ async function getSettings() {
   return cachePromise;
 }
 
-async function getAll() {
-  return await getSettings();
-}
-
 async function get(key) {
-  const settings = await getSettings();
-  return settings[key];
+  const settingsData = await getSettings();
+
+  // Get a single setting.
+  if (typeof key === "string") {
+    if (!(key in settingsData)) {
+      throw new Error(`Unknown settings key: ${key}`);
+    }
+
+    return settingsData[key];
+  }
+
+  // Get multiple settings.
+  if (Array.isArray(key)) {
+    const data = {};
+
+    for (const item of key) {
+      if (typeof item !== "string") {
+        throw new TypeError("Settings keys must be strings.");
+      }
+
+      if (!(item in settingsData)) {
+        throw new Error(`Unknown settings key: ${item}`);
+      }
+
+      data[item] = settingsData[item];
+    }
+
+    return data;
+  }
+
+  throw new TypeError("Settings key must be a string or an array of strings.");
 }
 
 async function set(key, value) {
@@ -74,4 +99,4 @@ async function set(key, value) {
   return true;
 }
 
-export const settings = { get, getAll, set };
+export const settings = { get, set };
