@@ -11,12 +11,13 @@ const User = ({ children }) => {
 
   return (
     <Box
+      flexDirection="row"
+      flexWrap="nowrap"
       width="100%"
       padding={1}
-      backgroundColor={"#212121"}
-      marginTop={1}
-      flexDirection="row"
       gap={1}
+      marginTop={1}
+      backgroundColor={"#212121"}
       alignItems="flex-start"
     >
       <Box flexShrink={0}>

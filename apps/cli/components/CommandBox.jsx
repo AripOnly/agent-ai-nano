@@ -5,10 +5,9 @@ import { Box, Text } from "ink";
 import SelectInput from "./SelectInput.jsx";
 
 const COMMANDS = [
-  { value: "session", label: "/session" },
-  { value: "new", label: "/new" },
-  { value: "provider", label: "/provider" },
-  { value: "model", label: "/model" },
+  { value: "session", label: "/session", description: "switch session" },
+  { value: "new", label: "/new", description: "new session" },
+  { value: "model", label: "/model", description: "switch model" },
 ];
 
 const CommandBox = ({ filter = "", onSelect, onCancel }) => {

@@ -1,7 +1,7 @@
 // useColumns.js
 
 import { useEffect, useState } from "react";
-import { useStdout } from "ink";
+import { useStdout, useWindowSize } from "ink";
 
 const subscribers = new Set();
 let sharedHandler = null;

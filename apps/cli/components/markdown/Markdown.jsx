@@ -240,7 +240,7 @@ export default function Markdown({ content, width }) {
       case "hr":
         return (
           <Box key={key} marginBottom={margin}>
-            <Text color="gray">{"─".repeat(columns)}</Text>
+            <Text color="gray">{"─".repeat(columns - 1)}</Text>
           </Box>
         );
 
@@ -326,9 +326,7 @@ export default function Markdown({ content, width }) {
 
   return (
     <Box flexDirection="column" width={columns}>
-      {tokens.map((t, i) =>
-        renderBlock(t, i, tokens[i + 1]?.type === "space"),
-      )}
+      {tokens.map((t, i) => renderBlock(t, i, tokens[i + 1]?.type === "space"))}
     </Box>
   );
 }

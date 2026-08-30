@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "nano": "npx tsx app.jsx",
-    "cli": "node apps/cli/cli-app.js"
+    "nano": "npx tsx app.jsx"
   },
   "dependencies": {
     "@google/genai": "^2.10.0",

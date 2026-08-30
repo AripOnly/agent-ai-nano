@@ -43,14 +43,27 @@ const SelectInput = ({ items = [], onSelect, onCancel, isFocused = true }) => {
   return (
     <Box flexDirection="column">
       {items.map((item, index) => (
-        <Text key={item.value ?? index}>
-          {index === cursor ? (
-            <Text color="green">{"▸ "}</Text>
-          ) : (
-            <Text color="gray">{"  "}</Text>
-          )}
-          {item.label}
-        </Text>
+        <Box key={item.value ?? index}>
+          <Box
+            width={"100%"}
+            paddingX={1}
+            backgroundColor={index === cursor ? "#ffa857e8" : ""}
+            flexDirection="row"
+            flexWrap="nowrap"
+            gap={5}
+          >
+            <Box width={item?.description !== undefined ? 15 : ""}>
+              <Text color={index === cursor ? "#111111" : ""}>
+                {item.label}
+              </Text>
+            </Box>
+            <Box>
+              <Text color={index === cursor ? "#111111" : "#858585"}>
+                {item?.description}
+              </Text>
+            </Box>
+          </Box>
+        </Box>
       ))}
     </Box>
   );

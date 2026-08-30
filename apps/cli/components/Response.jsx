@@ -18,14 +18,17 @@ const Response = ({ response, type }) => {
     <Box
       flexDirection="row"
       flexWrap="nowrap"
+      width="100%"
+      padding={1}
       gap={1}
       marginTop={1}
-      marginLeft={1}
+      backgroundColor={bgColor}
+      alignItems="flex-start"
     >
       <Box flexShrink={0}>
         <Text>{icon[type]}</Text>
       </Box>
-      <Box width={markdownWidth} backgroundColor={bgColor}>
+      <Box width={markdownWidth}>
         <MarkdownRenderer content={response} width={markdownWidth} />
       </Box>
     </Box>

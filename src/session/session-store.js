@@ -84,9 +84,6 @@ class SessionStore {
   }
 
   compact(session_id, summary) {
-    //   this.start(session_id, EVENT.COMPACTION, summary);
-    //   this.commit(session_id);
-
     sql
       .prepare("UPDATE session SET summary = ? WHERE id = ?")
       .run(summary, session_id);
