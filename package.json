@@ -2,14 +2,21 @@
   "name": "agentai",
   "version": "1.0.0",
   "type": "module",
+  "bin": {
+    "nano": "./bin/nano.js"
+  },
+  "private": true,
   "scripts": {
-    "nano": "npx tsx app.jsx"
+    "nano": "npx tsx app.jsx",
+    "test": "node ./test/test.js"
   },
   "dependencies": {
     "@google/genai": "^2.10.0",
     "better-sqlite3": "^12.11.1",
     "cli-spinners": "^3.4.0",
+    "cors": "^2.8.6",
     "dotenv": "^17.4.2",
+    "express": "^5.2.1",
     "highlight.js": "^11.11.1",
     "ink": "^7.1.1",
     "ink-big-text": "^2.0.0",
@@ -21,9 +28,8 @@
     "remark-breaks": "^4.0.0",
     "remark-gfm": "^4.0.1",
     "remark-parse": "^11.0.0",
-    "unified": "^11.0.5"
-  },
-  "devDependencies": {
-    "tsx": "^4.23.1"
+    "tsx": "^4.23.1",
+    "unified": "^11.0.5",
+    "ws": "^8.21.3"
   }
 }

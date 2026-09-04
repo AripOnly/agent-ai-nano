@@ -35,7 +35,8 @@ Create a `config/settings.json` file with the following content:
   "username": "arip",
   "provider": "google",
   "model": "gemini-3.1-flash-lite",
-  "apiKey": "YOUR_API_KEY"
+  "apiKey": "YOUR_API_KEY",
+  "serper_api_key": "YOUR_API_KEY"
 }
 ```
 

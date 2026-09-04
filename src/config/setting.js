@@ -34,7 +34,7 @@ async function load() {
       await fs.mkdir(path.dirname(SETTINGS_PATH), { recursive: true });
       await fs.writeFile(SETTINGS_PATH, data, "utf-8");
 
-      return data;
+      return JSON.parse(data);
     }
 
     throw error;

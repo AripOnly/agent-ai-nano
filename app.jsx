@@ -1,10 +1,5 @@
-import React from "react";
-import { render } from "ink";
-import App from "./apps/cli/App.jsx";
+// app.jsx
 
-try {
-  const { waitUntilExit } = render(<App />);
-  await waitUntilExit();
-} catch (error) {
-  console.log(error.stack);
-}
+import { startCLI } from "./apps/cli/main.jsx";
+
+await startCLI();
