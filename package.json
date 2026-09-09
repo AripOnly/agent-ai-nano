@@ -7,8 +7,7 @@
   },
   "private": true,
   "scripts": {
-    "nano": "npx tsx app.jsx",
-    "test": "node ./test/test.js"
+    "nano": "npx tsx app.jsx"
   },
   "dependencies": {
     "@google/genai": "^2.10.0",

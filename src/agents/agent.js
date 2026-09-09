@@ -3,7 +3,7 @@
 import { settings } from "../config/setting.js";
 import { agentLoop } from "./agent-loop.js";
 import { sessionStore } from "../session/session-store.js";
-import { EVENT } from "./event-type.js";
+import { EVENT } from "../shared/event-type.js";
 import { agents } from "./registry.js";
 import { createInstruction } from "../prompts/createInstruction.js";
 import { compaction, checkCompaction } from "./compaction.js";

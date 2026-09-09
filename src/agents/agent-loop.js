@@ -1,6 +1,6 @@
 // src/agent/agent.js
 
-import { EVENT } from "./event-type.js";
+import { EVENT } from "../shared/event-type.js";
 import { llm } from "../llm/llm.js";
 import { toolExecute } from "./tool-execute.js";
 import { toStr } from "../utils/tostr.js";

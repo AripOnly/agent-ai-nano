@@ -1,5 +1,4 @@
-// src/core/protocol/google-protocol.js
-// event-type.js
+// src/agent/event-type.js
 
 export const EVENT = {
   USER: "user",
@@ -12,4 +11,5 @@ export const EVENT = {
   COMPACTION: "compaction",
   TOKEN: "token",
   ERROR: "error",
+  DONE: "done",
 };

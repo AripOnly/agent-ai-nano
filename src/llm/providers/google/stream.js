@@ -1,6 +1,6 @@
 // src/provider/google/google-clean-output.js
 
-import { EVENT } from "../../../agents/event-type.js";
+import { EVENT } from "../../../shared/event-type.js";
 
 function parseArguments(raw) {
   if (typeof raw !== "string" || raw.trim() === "") return {};

@@ -2,7 +2,7 @@
 
 import sql from "./sql.js";
 import { randomUUID } from "node:crypto";
-import { EVENT } from "../agents/event-type.js";
+import { EVENT } from "../shared/event-type.js";
 
 export function nameFromPrompt(prompt) {
   const words = prompt.trim().split(/\s+/).filter(Boolean).slice(0, 5);
@@ -32,6 +32,7 @@ class SessionStore {
 
     if (event.role === EVENT.COMPACTION) return;
     if (event.role === EVENT.TOKEN) return;
+    if (event.role === EVENT.ERROR) return;
 
     if (event.role === EVENT.ASSISTANT) {
       state.response += event.content?.text ?? "";

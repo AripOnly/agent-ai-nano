@@ -1,7 +1,7 @@
 import { GoogleGenAI } from "@google/genai";
 import "dotenv/config";
 import { stream } from "./stream.js";
-import { EVENT } from "../../../agents/event-type.js";
+import { EVENT } from "../../../shared/event-type.js";
 import { settings } from "../../../config/setting.js";
 
 let client = null;
@@ -82,6 +82,15 @@ export async function* request(request) {
     const client = await getClient();
 
     const input = request.input.map(toGemini).filter((part) => part != null);
+
+    yield {
+      role: EVENT.ASSISTANT,
+      content: {
+        text: "ok",
+      },
+    };
+
+    return;
 
     const body = {
       model: request.model,

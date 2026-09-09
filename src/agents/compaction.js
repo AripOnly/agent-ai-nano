@@ -2,7 +2,7 @@
 
 import { llm } from "../llm/llm.js";
 import { createInstruction } from "../prompts/createInstruction.js";
-import { EVENT } from "./event-type.js";
+import { EVENT } from "../shared/event-type.js";
 import { sessionStore } from "../session/session-store.js";
 import models from "../llm/providers/google/models.js";
 import { agents } from "./registry.js";
