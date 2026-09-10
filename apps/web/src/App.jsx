@@ -1,6 +1,6 @@
 // apps/web/src/App.jsx
 
-import MainLayout from "./Layout";
+import MainLayout from "./layout/MainLayout.jsx";
 
 export default function App() {
   return <MainLayout />;
